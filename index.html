@@ -5,7 +5,7 @@
   <script type="module">
     // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+    import { getDatabase, ref, set, onValue, push } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
     // For Firebase JS SDK v7.20.0 and later, measurementId is optional
     const firebaseConfig = {
@@ -17,23 +17,32 @@
     appId: "1:316071093036:web:233a3bf23d007bb0a2c289",
     measurementId: "G-RW2RPJS2GC"
     };
-
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Write data to Firebase
-    const numbers = ['number1', 'number2', 'number3'];
-    const nurses = ['nurse1', 'nurse2', 'nurse3'];
-    const beds = ['bed1', 'bed2', 'bed3'];
+    // Define rooms, nurses, and numbers
+    const rooms = ['Room 1', 'Room 2', 'Room 3', 'Room 4'];
+    const nurses = ['Nurse 1', 'Nurse 2', 'Nurse 3', 'Nurse 4', 'Nurse 5'];
+    const numbers = ['Number 1', 'Number 2', 'Number 3', 'Number 4', 'Number 5'];
 
-    const data = {
-      number: numbers[Math.floor(Math.random() * numbers.length)],
-      nurse: nurses[Math.floor(Math.random() * nurses.length)],
-      bed: beds[Math.floor(Math.random() * beds.length)]
-    };
+    // Function to submit data
+    window.submitData = function() {
+      const room = document.getElementById('room').value;
+      const nurse = document.getElementById('nurse').value;
+      const number = document.getElementById('number').value;
+      const timestamp = new Date().toLocaleString();
 
-    set(ref(db, '/data'), data);
+      const data = {
+        room,
+        nurse,
+        number,
+        timestamp
+      };
+
+      // Write data to Firebase
+      push(ref(db, '/data'), data);
+    }
 
     // Read data from Firebase
     const dataRef = ref(db, '/data');
@@ -44,6 +53,36 @@
   </script>
 </head>
 <body>
+  <div>
+    <select id="room">
+      <option disabled selected>Select Room</option>
+      <option>Room 1</option>
+      <option>Room 2</option>
+      <option>Room 3</option>
+      <option>Room 4</option>
+    </select>
+
+    <select id="nurse">
+      <option disabled selected>Select Nurse</option>
+      <option>Nurse 1</option>
+      <option>Nurse 2</option>
+      <option>Nurse 3</option>
+      <option>Nurse 4</option>
+      <option>Nurse 5</option>
+    </select>
+
+    <select id="number">
+      <option disabled selected>Select Number</option>
+      <option>Number 1</option>
+      <option>Number 2</option>
+      <option>Number 3</option>
+      <option>Number 4</option>
+      <option>Number 5</option>
+    </select>
+
+    <button onclick="submitData()">Submit</button>
+  </div>
+
   <div id="dataContainer"></div>
 
   <script>
@@ -51,11 +90,19 @@
       console.log('Data:', data);
 
       var dataContainer = document.getElementById('dataContainer');
-      dataContainer.innerHTML = `
-        <p>Number: ${data.number}</p>
-        <p>Nurse: ${data.nurse}</p>
-        <p>Bed: ${data.bed}</p>
-      `;
+      dataContainer.innerHTML = '';
+
+      for (let key in data) {
+        const entry = data[key];
+        dataContainer.innerHTML += `
+          <div>
+            <p>Room: ${entry.room}</p>
+            <p>Nurse: ${entry.nurse}</p>
+            <p>Number: ${entry.number}</p>
+            <p>Timestamp: ${entry.timestamp}</p>
+          </div>
+        `;
+      }
     }
   </script>
 </body>
