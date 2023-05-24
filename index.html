@@ -3,28 +3,39 @@
 <head>
   <title>Spreadsheet Data</title>
   <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyCYDVebdIbJ7DV_tkqvl6dXacP2gd-V6zo",
-    authDomain: "nurse-numbers.firebaseapp.com",
-    projectId: "nurse-numbers",
-    storageBucket: "nurse-numbers.appspot.com",
-    messagingSenderId: "316071093036",
-    appId: "1:316071093036:web:233a3bf23d007bb0a2c289",
-    measurementId: "G-RW2RPJS2GC"
-  };
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      // Your config here
+    };
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // Write data to Firebase
+    const numbers = ['number1', 'number2', 'number3'];
+    const nurses = ['nurse1', 'nurse2', 'nurse3'];
+    const beds = ['bed1', 'bed2', 'bed3'];
+
+    const data = {
+      number: numbers[Math.floor(Math.random() * numbers.length)],
+      nurse: nurses[Math.floor(Math.random() * nurses.length)],
+      bed: beds[Math.floor(Math.random() * beds.length)]
+    };
+
+    set(ref(db, '/data'), data);
+
+    // Read data from Firebase
+    const dataRef = ref(db, '/data');
+    onValue(dataRef, (snapshot) => {
+      const data = snapshot.val();
+      displayData(data);
+    });
+  </script>
 </head>
 <body>
   <div id="dataContainer"></div>
@@ -35,20 +46,11 @@
 
       var dataContainer = document.getElementById('dataContainer');
       dataContainer.innerHTML = `
-        <p>Time: ${data.time}</p>
-        <p>Room Number: ${data.room}</p>
-        <p>Nurse Name: ${data.nurse}</p>
-        <p>Phone Number: ${data.phone}</p>
+        <p>Number: ${data.number}</p>
+        <p>Nurse: ${data.nurse}</p>
+        <p>Bed: ${data.bed}</p>
       `;
     }
-
-    function fetchData() {
-      var script = document.createElement('script');
-      script.src = 'https://script.google.com/macros/s/AKfycbznjmVh-0hMIDZRsOOPzX-6brJcDlL41bPuvLCw_m7x80ZqYH23hJtW_dZPzhQJJJv2wQ/exec?callback=displayData';
-      document.head.appendChild(script);
-    }
-
-    fetchData();
   </script>
 </body>
 </html>
