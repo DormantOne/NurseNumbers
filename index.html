@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Spreadsheet Data</title>
+</head>
+<body>
+  <div id="dataContainer"></div>
+
+  <script>
+    function displayData(data) {
+      console.log('Data:', data);
+
+      var dataContainer = document.getElementById('dataContainer');
+      dataContainer.innerHTML = `
+        <p>Time: ${data.time}</p>
+        <p>Room Number: ${data.room}</p>
+        <p>Nurse Name: ${data.nurse}</p>
+        <p>Phone Number: ${data.phone}</p>
+      `;
+    }
+
+    function fetchData() {
+      var script = document.createElement('script');
+      script.src = 'https://script.google.com/macros/s/AKfycbxBLaycTwRPwDfWSvlXynWbWOcn8lNfmYivoLsYF5sr75Y1XyqxsYYTGIthfIIrm4XGxw/exec?callback=displayData';
+      document.head.appendChild(script);
+    }
+
+    fetchData();
+  </script>
+</body>
+</html>
