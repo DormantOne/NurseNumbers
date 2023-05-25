@@ -17,6 +17,7 @@ const firebaseConfig = {
   appId: "1:316071093036:web:233a3bf23d007bb0a2c289",
   measurementId: "G-RW2RPJS2GC"
 };
+
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
@@ -39,7 +40,7 @@ const firebaseConfig = {
     }
 
     // Listen for new entries in Firebase
-    const rooms = ['Room 1', 'Room 2', 'Room 3', 'Room 4'];
+    const rooms = ['4E Room 1', '4E Room 2', '4E Room 3', '4E Room 4'];
     rooms.forEach((room) => {
       const dataRef = ref(db, '/data/' + room);
       onChildAdded(dataRef, (snapshot) => {
@@ -54,12 +55,14 @@ const firebaseConfig = {
   <div>
     <h2>Enter Data</h2>
     <div id="entryContainer"></div>
-    <button onclick="submitData('Room 1')">Submit</button>
+    <button onclick="submitData('4E Room 1')">Submit</button>
   </div>
 
   <script>
     const entryContainer = document.getElementById('entryContainer');
-    const rooms = ['Room 1', 'Room 2', 'Room 3', 'Room 4'];
+    const rooms = ['4E Room 1', '4E Room 2', '4E Room 3', '4E Room 4'];
+    const nurses = ['Jane Doe', 'John Smith', 'Emily Johnson', 'Michael Brown', 'Emma Davis', 'James Miller'];
+    const numbers = ['123456789', '234567890', '345678901', '456789012', '567890123', '678901234'];
 
     const generateOptions = (options) => {
       return options.map(option => `<option>${option}</option>`).join('');
@@ -95,3 +98,4 @@ const firebaseConfig = {
   </script>
 </body>
 </html>
+
