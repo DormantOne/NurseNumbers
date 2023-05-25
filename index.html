@@ -86,24 +86,31 @@
   <div id="dataContainer"></div>
 
   <script>
-    function displayData(data) {
-      console.log('Data:', data);
+function displayData(data) {
+  console.log('Data:', data);
 
-      var dataContainer = document.getElementById('dataContainer');
-      dataContainer.innerHTML = '';
+  var dataContainer = document.getElementById('dataContainer');
+  dataContainer.innerHTML = '';
 
-      for (let key in data) {
-        const entry = data[key];
-        dataContainer.innerHTML += `
-          <div>
-            <p>Room: ${entry.room}</p>
-            <p>Nurse: ${entry.nurse}</p>
-            <p>Number: ${entry.number}</p>
-            <p>Timestamp: ${entry.timestamp}</p>
-          </div>
-        `;
-      }
-    }
+  // Get the keys of the data object
+  const dataKeys = Object.keys(data);
+
+  // Sort the keys in descending order so the most recent entry is displayed first
+  dataKeys.sort((a, b) => (data[b].timestamp > data[a].timestamp) ? 1 : -1);
+
+  dataKeys.forEach((key) => {
+    const entry = data[key];
+    dataContainer.innerHTML += `
+      <div>
+        <p>Room: ${entry.room}</p>
+        <p>Nurse: ${entry.nurse}</p>
+        <p>Number: ${entry.number}</p>
+        <p>Timestamp: ${entry.timestamp}</p>
+      </div>
+    `;
+  });
+}
+
   </script>
 </body>
 </html>
