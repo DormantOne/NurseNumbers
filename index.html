@@ -22,93 +22,76 @@ const firebaseConfig = {
     const db = getDatabase(app);
 
     // Function to submit data
-    window.submitData = function() {
-      const data = {};
+    window.submitData = function(room) {
+      const nurse = document.getElementById('nurse' + room).value;
+      const number = document.getElementById('number' + room).value;
+      const timestamp = new Date().toLocaleString();
 
-      // Loop through each room
-      for (let i = 1; i <= 4; i++) {
-        const room = document.getElementById(`room${i}`).textContent;
-        const nurse = document.getElementById(`nurse${i}`).value;
-        const number = document.getElementById(`number${i}`).value;
-
-        data[room] = {
-          nurse,
-          number,
-          timestamp: new Date().toLocaleString()
-        };
-      }
+      const data = {
+        room,
+        nurse,
+        number,
+        timestamp
+      };
 
       // Write data to Firebase
-      push(ref(db, '/data'), data);
+      push(ref(db, '/data/' + room), data);
     }
 
     // Listen for new entries in Firebase
-    onChildAdded(ref(db, '/data'), (snapshot) => {
-      const data = snapshot.val();
-      displayData(data);
+    const rooms = ['Room 1', 'Room 2', 'Room 3', 'Room 4'];
+    rooms.forEach((room) => {
+      const dataRef = ref(db, '/data/' + room);
+      onChildAdded(dataRef, (snapshot) => {
+        displayData(room, snapshot.val());
+      });
     });
   </script>
 </head>
 <body>
-  <h2>Enter Data</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Room</th>
-        <th>Nurse</th>
-        <th>Number</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td id="room1">4E Room 1</td>
-        <td>
-          <select id="nurse1">
-            <option disabled selected>Select Nurse</option>
-            ${generateOptions(nurses)}
-          </select>
-        </td>
-        <td>
-          <select id="number1">
-            <option disabled selected>Select Number</option>
-            ${generateOptions(numbers)}
-          </select>
-        </td>
-      </tr>
-      <tr>
-        <td id="room2">4E Room 2</td>
-        <td>
-          <select id="nurse2">
-            <option disabled selected>Select Nurse</option>
-            ${generateOptions(nurses)}
-          </select>
-        </td>
-        <td>
-          <select id="number2">
-            <option disabled selected>Select Number</option>
-            ${generateOptions(numbers)}
-          </select>
-        </td>
-      </tr>
-      <!-- Add more rows for additional rooms -->
-    </tbody>
-  </table>
+  <div id="dataContainer"></div>
 
-  <button onclick="submitData()">Submit</button>
+  <div>
+    <h2>Enter Data</h2>
+    <div id="entryContainer"></div>
+    <button onclick="submitData('Room 1')">Submit</button>
+  </div>
 
   <script>
-    const nurses = ['Jane Doe', 'John Smith', 'Emily Johnson', 'Michael Brown', 'Emma Davis', 'James Miller'];
-    const numbers = ['123456789', '234567890', '345678901', '456789012', '567890123', '678901234'];
+    const entryContainer = document.getElementById('entryContainer');
+    const rooms = ['Room 1', 'Room 2', 'Room 3', 'Room 4'];
 
-    function generateOptions(options) {
+    const generateOptions = (options) => {
       return options.map(option => `<option>${option}</option>`).join('');
-    }
+    };
 
-    function displayData(data) {
+    rooms.forEach((room) => {
+      entryContainer.innerHTML += `
+        <div>
+          <h3>${room}</h3>
+          <select id="nurse${room}">
+            <option disabled selected>Select Nurse</option>
+            ${generateOptions(nurses)}
+          </select>
+
+          <select id="number${room}">
+            <option disabled selected>Select Number</option>
+            ${generateOptions(numbers)}
+          </select>
+        </div>
+      `;
+    });
+
+    function displayData(room, data) {
       console.log('Data:', data);
 
       var dataContainer = document.getElementById('dataContainer');
       dataContainer.innerHTML = `
         <div>
-          ${Object.entries(data).map(([room, entry]) => <p>${room}: ${entry.nurse} <a href="tel:${entry.number}">${entry.number}</a></p> ).join('')} </div> ` + dataContainer.innerHTML; } </script>
-</body> </html>
+          <p>${room}: ${data.nurse} <a href="tel:${data.number}">${data.number}</a></p>
+        </div>
+      ` + dataContainer.innerHTML;
+    }
+  </script>
+</body>
+</html>
