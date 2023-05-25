@@ -23,10 +23,9 @@ const firebaseConfig = {
     const db = getDatabase(app);
 
     // Function to submit data
-    window.submitData = function() {
-      const room = document.getElementById('room').value;
-      const nurse = document.getElementById('nurse').value;
-      const number = document.getElementById('number').value;
+    window.submitData = function(room) {
+      const nurse = document.getElementById('nurse' + room).value;
+      const number = document.getElementById('number' + room).value;
       const timestamp = new Date().toLocaleString();
 
       const data = {
@@ -37,64 +36,66 @@ const firebaseConfig = {
       };
 
       // Write data to Firebase
-      push(ref(db, '/data'), data);
+      push(ref(db, '/data/' + room), data);
     }
 
     // Listen for new entries in Firebase
-    const dataRef = ref(db, '/data');
-    onChildAdded(dataRef, (snapshot) => {
-      displayData(snapshot.val());
-    });
+    for (let i = 1; i <= 4; i++) {
+      const dataRef = ref(db, '/data/4E Room ' + i);
+      onChildAdded(dataRef, (snapshot) => {
+        displayData('4E Room ' + i, snapshot.val());
+      });
+    }
   </script>
 </head>
 <body>
-  <div>
-    <select id="room">
-      <option disabled selected>Select Room</option>
-      <option>4E Room 1</option>
-      <option>4E Room 2</option>
-      <option>4E Room 3</option>
-      <option>4E Room 4</option>
-    </select>
-
-    <select id="nurse">
-      <option disabled selected>Select Nurse</option>
-      <option>Jane Doe</option>
-      <option>John Smith</option>
-      <option>Emily Johnson</option>
-      <option>Michael Brown</option>
-      <option>Emma Davis</option>
-      <option>James Miller</option>
-    </select>
-
-    <select id="number">
-      <option disabled selected>Select Number</option>
-      <option>123456789</option>
-      <option>234567890</option>
-      <option>345678901</option>
-      <option>456789012</option>
-      <option>567890123</option>
-      <option>678901234</option>
-    </select>
-
-    <button onclick="submitData()">Submit</button>
-  </div>
-
   <div id="dataContainer"></div>
 
+  <div>
+    <h2>Enter Data</h2>
+    <div id="entryContainer"></div>
+  </div>
+
   <script>
-    function displayData(data) {
+    const entryContainer = document.getElementById('entryContainer');
+    for (let i = 1; i <= 4; i++) {
+      entryContainer.innerHTML += `
+        <div>
+          <h3>4E Room ${i}</h3>
+          <select id="nurse4E Room ${i}">
+            <option disabled selected>Select Nurse</option>
+            <option>Jane Doe</option>
+            <option>John Smith</option>
+            <option>Emily Johnson</option>
+            <option>Michael Brown</option>
+            <option>Emma Davis</option>
+            <option>James Miller</option>
+          </select>
+
+          <select id="number4E Room ${i}">
+            <option disabled selected>Select Number</option>
+            <option>123456789</option>
+            <option>234567890</option>
+            <option>345678901</option>
+            <option>456789012</option>
+            <option>567890123</option>
+            <option>678901234</option>
+          </select>
+
+          <button onclick="submitData('4E Room ${i}')">Submit</button>
+        </div>
+      `;
+    }
+
+    function displayData(room, data) {
       console.log('Data:', data);
 
       var dataContainer = document.getElementById('dataContainer');
       dataContainer.innerHTML = `
         <div>
-          <p>Room: ${data.room}</p>
-          <p>Nurse: ${data.nurse}</p>
-          <p>Number: <a href="tel:${data.number}">${data.number}</a></p>
-          <p>Timestamp: ${data.timestamp}</p>
+          <p>${room}: ${data.nurse} <a href="tel:${data.number}">${data.number}</a></p>
         </div>
-      `;
+      ` + dataContainer.innerHTML;
     }
   </script>
 </body>
