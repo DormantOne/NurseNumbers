@@ -18,7 +18,6 @@ const firebaseConfig = {
   measurementId: "G-RW2RPJS2GC"
 };
 
-
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
@@ -52,28 +51,30 @@ const firebaseConfig = {
   <div>
     <select id="room">
       <option disabled selected>Select Room</option>
-      <option>Room 1</option>
-      <option>Room 2</option>
-      <option>Room 3</option>
-      <option>Room 4</option>
+      <option>4E Room 1</option>
+      <option>4E Room 2</option>
+      <option>4E Room 3</option>
+      <option>4E Room 4</option>
     </select>
 
     <select id="nurse">
       <option disabled selected>Select Nurse</option>
-      <option>Nurse 1</option>
-      <option>Nurse 2</option>
-      <option>Nurse 3</option>
-      <option>Nurse 4</option>
-      <option>Nurse 5</option>
+      <option>Jane Doe</option>
+      <option>John Smith</option>
+      <option>Emily Johnson</option>
+      <option>Michael Brown</option>
+      <option>Emma Davis</option>
+      <option>James Miller</option>
     </select>
 
     <select id="number">
       <option disabled selected>Select Number</option>
-      <option>Number 1</option>
-      <option>Number 2</option>
-      <option>Number 3</option>
-      <option>Number 4</option>
-      <option>Number 5</option>
+      <option>123456789</option>
+      <option>234567890</option>
+      <option>345678901</option>
+      <option>456789012</option>
+      <option>567890123</option>
+      <option>678901234</option>
     </select>
 
     <button onclick="submitData()">Submit</button>
@@ -90,10 +91,10 @@ const firebaseConfig = {
         <div>
           <p>Room: ${data.room}</p>
           <p>Nurse: ${data.nurse}</p>
-          <p>Number: ${data.number}</p>
+          <p>Number: <a href="tel:${data.number}">${data.number}</a></p>
           <p>Timestamp: ${data.timestamp}</p>
         </div>
-      ` + dataContainer.innerHTML;
+      `;
     }
   </script>
 </body>
