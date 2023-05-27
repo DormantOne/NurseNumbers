@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Select Nurses</title>
+  <title>Select Nurses and Numbers</title>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
     import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
@@ -30,32 +30,39 @@ const firebaseConfig = {
         }
       }
 
+      const selectedNumbers = [];
+      for (let i = 0; i < 10; i++) {
+        const checkbox = document.getElementById('number' + i);
+        if (checkbox.checked) {
+          selectedNumbers.push(checkbox.value);
+        }
+      }
+
+      if (selectedNurses.length === 0 && selectedNumbers.length === 0) {
+        alert('Please select at least one nurse or one number.');
+        return;
+      }
+
       const timestamp = new Date().toLocaleString();
       const data = {
         selectedNurses,
+        selectedNumbers,
         timestamp
       };
 
-      set(ref(db, '/selectedNurses'), data);
-
-      // Display selected nurses on the page
-      const selectedNursesDiv = document.getElementById('selectedNurses');
-      selectedNursesDiv.innerHTML = `
-        <p>Selected Nurses: ${selectedNurses.join(', ')}</p>
-        <p>Timestamp: ${timestamp}</p>
-      `;
+      set(ref(db, '/selectedData'), data);
     }
   </script>
 </head>
 <body>
-  <h2>Select Nurses:</h2>
-  <form id="nurseForm">
+  <h2>Select Nurses and Numbers:</h2>
+  <form id="selectionForm">
     <div id="nurseSelection"></div>
+    <div id="numberSelection"></div>
     <button type="button" onclick="submitSelection()">Submit</button>
   </form>
-
-  <h2>Selected Nurses:</h2>
-  <div id="selectedNurses"></div>
+  <h2>Selected Nurses and Numbers:</h2>
+  <div id="selectedData"></div>
 
   <script>
     const nurses = ['Nurse 1', 'Nurse 2', 'Nurse 3', 'Nurse 4', 'Nurse 5', 'Nurse 6', 'Nurse 7', 'Nurse 8', 'Nurse 9', 'Nurse 10'];
@@ -66,6 +73,18 @@ const firebaseConfig = {
         <div>
           <input type="checkbox" id="nurse${index}" name="nurse" value="${nurse}">
           <label for="nurse${index}">${nurse}</label>
+        </div>
+      `;
+    });
+
+    const numbers = ['123456789', '234567890', '345678901', '456789012', '567890123', '678901234'];
+    const numberSelection = document.getElementById('numberSelection');
+
+    numbers.forEach((number, index) => {
+      numberSelection.innerHTML += `
+        <div>
+          <input type="checkbox" id="number${index}" name="number" value="${number}">
+          <label for="number${index}">${number}</label>
         </div>
       `;
     });
