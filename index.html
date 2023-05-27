@@ -42,6 +42,13 @@ const firebaseConfig = {
       };
 
       set(ref(db, '/selectedNurses'), data);
+
+      // Display selected nurses on the page
+      const selectedNursesDiv = document.getElementById('selectedNurses');
+      selectedNursesDiv.innerHTML = `
+        <p>Selected Nurses: ${selectedNurses.join(', ')}</p>
+        <p>Timestamp: ${timestamp}</p>
+      `;
     }
   </script>
 </head>
@@ -51,6 +58,9 @@ const firebaseConfig = {
     <div id="nurseSelection"></div>
     <button type="button" onclick="submitSelection()">Submit</button>
   </form>
+
+  <h2>Selected Nurses:</h2>
+  <div id="selectedNurses"></div>
 
   <script>
     const nurses = ['Nurse 1', 'Nurse 2', 'Nurse 3', 'Nurse 4', 'Nurse 5', 'Nurse 6', 'Nurse 7', 'Nurse 8', 'Nurse 9', 'Nurse 10'];
