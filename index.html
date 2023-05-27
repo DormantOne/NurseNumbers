@@ -1,52 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-  
-  
-<script type="text/javascript">
-    window.onload = function() {
-        var referrer = document.referrer;
-        var referrerHostname;
-        try {
-            referrerHostname = new URL(referrer).hostname;
-        } catch(e) {
-            referrerHostname = 'No referrer';
-        }
-        alert('Referrer hostname: ' + referrerHostname);
-    }
-</script>
-
-
-
-  
-
-
-
   <title>Spreadsheet Data</title>
   <script type="module">
-    // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCYDVebdIbJ7DV_tkqvl6dXacP2gd-V6zo",
-  authDomain: "nurse-numbers.firebaseapp.com",
-  databaseURL: "https://nurse-numbers-default-rtdb.firebaseio.com",
-  projectId: "nurse-numbers",
-  storageBucket: "nurse-numbers.appspot.com",
-  messagingSenderId: "316071093036",
-  appId: "1:316071093036:web:233a3bf23d007bb0a2c289",
-  measurementId: "G-RW2RPJS2GC"
-};
+    const firebaseConfig = {
+      // Your Firebase configuration
+    };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Function to submit data
     window.submitData = function(room) {
       const nurse = document.getElementById('nurse' + room).value;
-      const number = document.getElementById('number' + room).value;
+      const number = document.getElementById('number' + nurse).value;
       const timestamp = new Date().toLocaleString();
 
       const data = {
@@ -56,15 +25,13 @@ const firebaseConfig = {
         timestamp
       };
 
-      // Write data to Firebase
-      push(ref(db, '/data/' + room), data);
+      set(ref(db, '/data/' + room), data);
     }
 
-    // Listen for new entries in Firebase
     for (let i = 1; i <= 4; i++) {
-      const dataRef = ref(db, '/data/4E Room ' + i);
-      onChildAdded(dataRef, (snapshot) => {
-        displayData('4E Room ' + i, snapshot.val());
+      const dataRef = ref(db, '/data/Room ' + i);
+      onValue(dataRef, (snapshot) => {
+        displayData('Room ' + i, snapshot.val());
       });
     }
   </script>
@@ -79,46 +46,39 @@ const firebaseConfig = {
 
   <script>
     const entryContainer = document.getElementById('entryContainer');
+    const nurses = ['Jane Doe', 'John Smith', 'Emily Johnson', 'Michael Brown'];
+    const numbers = ['123456789', '234567890', '345678901', '456789012'];
+
+    for (let i = 0; i < 4; i++) {
+      entryContainer.innerHTML += `
+        <div>
+          <h3>Nurse: ${nurses[i]}</h3>
+          <input type="text" id="number${nurses[i]}" value="${numbers[i]}" readonly>
+        </div>
+      `;
+    }
+
     for (let i = 1; i <= 4; i++) {
       entryContainer.innerHTML += `
         <div>
-          <h3>4E Room ${i}</h3>
-          <select id="nurse4E Room ${i}">
+          <h3>Room ${i}</h3>
+          <select id="nurseRoom ${i}">
             <option disabled selected>Select Nurse</option>
-            <option>Jane Doe</option>
-            <option>John Smith</option>
-            <option>Emily Johnson</option>
-            <option>Michael Brown</option>
-            <option>Emma Davis</option>
-            <option>James Miller</option>
+            ${nurses.map(nurse => `<option>${nurse}</option>`).join('')}
           </select>
-
-          <select id="number4E Room ${i}">
-            <option disabled selected>Select Number</option>
-            <option>123456789</option>
-            <option>234567890</option>
-            <option>345678901</option>
-            <option>456789012</option>
-            <option>567890123</option>
-            <option>678901234</option>
-          </select>
-
-          <button onclick="submitData('4E Room ${i}')">Submit</button>
+          <button onclick="submitData('Room ${i}')">Submit</button>
         </div>
       `;
     }
 
     function displayData(room, data) {
-      console.log('Data:', data);
-
-      var dataContainer = document.getElementById('dataContainer');
+      const dataContainer = document.getElementById('dataContainer');
       dataContainer.innerHTML = `
         <div>
-          <p>${room}: ${data.nurse} <a href="tel:${data.number}">${data.number}</a></p>
+          <p>${room}: ${data.nurse} <a href="tel:${data.number}">${data.number}</a> ${data.timestamp}</p>
         </div>
       ` + dataContainer.innerHTML;
     }
   </script>
 </body>
 </html>
- 
