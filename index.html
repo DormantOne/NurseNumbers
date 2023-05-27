@@ -4,7 +4,7 @@
   <title>Select Nurses and Numbers</title>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCYDVebdIbJ7DV_tkqvl6dXacP2gd-V6zo",
@@ -52,6 +52,19 @@ const firebaseConfig = {
 
       set(ref(db, '/selectedData'), data);
     }
+
+    const dataRef = ref(db, '/selectedData');
+    onValue(dataRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const selectedDataDiv = document.getElementById('selectedData');
+        selectedDataDiv.innerHTML = `
+          <p>Selected Nurses: ${data.selectedNurses.join(', ')}</p>
+          <p>Selected Numbers: ${data.selectedNumbers.join(', ')}</p>
+          <p>Timestamp: ${data.timestamp}</p>
+        `;
+      }
+    });
   </script>
 </head>
 <body>
@@ -80,6 +93,8 @@ const firebaseConfig = {
     const numbers = ['123456789', '234567890', '345678901', '456789012', '567890123', '678901234'];
     const numberSelection = document.getElementById('numberSelection');
 
+
+```html
     numbers.forEach((number, index) => {
       numberSelection.innerHTML += `
         <div>
