@@ -6,17 +6,16 @@
 <script type="text/javascript">
     window.onload = function() {
         var referrer = document.referrer;
-        if (!referrer) {
-            window.location.href = "https://myshadysidehandbook-my.sharepoint.com/:w:/g/personal/adamsohnen_myshadysidehandbook_onmicrosoft_com/EV9wuWxzwIRPtCQNxZ0AOWwB2WVJK2Q8U84Vfbb-VjWwgg?e=nNy034";
-            return;
+        var referrerHostname;
+        try {
+            referrerHostname = new URL(referrer).hostname;
+        } catch(e) {
+            referrerHostname = 'No referrer';
         }
-        var referrerHostname = new URL(referrer).hostname;
-        var allowedHostname = new URL("https://myshadysidehandbook-my.sharepoint.com/").hostname;
-        if (referrerHostname != allowedHostname) {
-            window.location.href = "https://myshadysidehandbook-my.sharepoint.com/:w:/g/personal/adamsohnen_myshadysidehandbook_onmicrosoft_com/EV9wuWxzwIRPtCQNxZ0AOWwB2WVJK2Q8U84Vfbb-VjWwgg?e=nNy034";
-        }
+        alert('Referrer hostname: ' + referrerHostname);
     }
 </script>
+
 
 
   
