@@ -30,11 +30,6 @@ const firebaseConfig = {
         }
       }
 
-      if (selectedNurses.length !== 4) {
-        alert('Please select exactly 4 nurses.');
-        return;
-      }
-
       const timestamp = new Date().toLocaleString();
       const data = {
         selectedNurses,
@@ -53,7 +48,7 @@ const firebaseConfig = {
   </script>
 </head>
 <body>
-  <h2>Select 4 Nurses:</h2>
+  <h2>Select Nurses:</h2>
   <form id="nurseForm">
     <div id="nurseSelection"></div>
     <button type="button" onclick="submitSelection()">Submit</button>
