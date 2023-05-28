@@ -49,18 +49,25 @@
         `;
       });
 
-      onValue(ref(db, '/selection'), snapshot => {
-        const data = snapshot.val();
+onValue(ref(db, '/selection'), snapshot => {
+  const data = snapshot.val();
 
-        if (data) {
-          selectedNursesquote("const firebaseConfig = {\n      apiKey: \"AIzaSyCYDVebdIbJ7DV_tkqvl6dXacP2gd-V6zo\",\n      authDomain: \"nurse-numbers.firebaseapp.com\",", "selectedNurses.forEach((nurse, index) => {\n            document.getElementById('nurse' + index).checked = true;\n          });")
+  if (data) {
+    selectedNurses = data.selectedNurses;
+    selectedNumbers = data.selectedNumbers;
 
-selectedNurses = data.selectedNurses;
-selectedNumbers = data.selectedNumbers;
+    selectedNurses.forEach((nurse, index) => {
+      document.getElementById('nurse' + index).checked = true;
+    });
 
-      selectedNurses.forEach((nurse, index) => {
-        document.getElementById('nurse' + index).checked = true;
-      });
+    selectedNumbers.forEach((number, index) => {
+      document.getElementById('number' + index).checked = true;
+    });
+
+    updateLinkSection();
+  }
+});
+
 
       selectedNumbers.forEach((number, index) => {
         document.getElementById('number' + index).checked = true;
