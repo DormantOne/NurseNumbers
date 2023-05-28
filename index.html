@@ -6,17 +6,16 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
     import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCYDVebdIbJ7DV_tkqvl6dXacP2gd-V6zo",
-  authDomain: "nurse-numbers.firebaseapp.com",
-  databaseURL: "https://nurse-numbers-default-rtdb.firebaseio.com",
-  projectId: "nurse-numbers",
-  storageBucket: "nurse-numbers.appspot.com",
-  messagingSenderId: "316071093036",
-  appId: "1:316071093036:web:233a3bf23d007bb0a2c289",
-  measurementId: "G-RW2RPJS2GC"
-};
-
+    const firebaseConfig = {
+      apiKey: "AIzaSyCYDVebdIbJ7DV_tkqvl6dXacP2gd-V6zo",
+      authDomain: "nurse-numbers.firebaseapp.com",
+      databaseURL: "https://nurse-numbers-default-rtdb.firebaseio.com",
+      projectId: "nurse-numbers",
+      storageBucket: "nurse-numbers.appspot.com",
+      messagingSenderId: "316071093036",
+      appId: "1:316071093036:web:233a3bf23d007bb0a2c289",
+      measurementId: "G-RW2RPJS2GC"
+    };
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
@@ -25,75 +24,101 @@ const firebaseConfig = {
     let selectedNumbers = [];
     let nurseNumberLinks = {};
 
-    window.submitSelection = function() {
-      const data = {
-        selectedNurses,
-        selectedNumbers,
-        timestamp: new Date().toLocaleString()
-      };
+    const nurses = ['Nurse 1', 'Nurse 2', 'Nurse 3', 'Nurse 4', 'Nurse 5', 'Nurse 6', 'Nurse 7', 'Nurse 8', 'Nurse 9', 'Nurse 10'];
+    const numbers = ['Number 1', 'Number 2', 'Number 3', 'Number 4', 'Number 5', 'Number 6', 'Number 7', 'Number 8', 'Number 9', 'Number 10'];
 
-      set(ref(db, '/selection'), data);
+    window.onload = function() {
+      const nurseSelection = document.getElementById('nurseSelection');
+      const numberSelection = document.getElementById('numberSelection');
 
-      updateLinkSection();
-    }
-
-    window.submitLinks = function() {
-      const data = {
-        nurseNumberLinks,
-        timestamp: new Date().toLocaleString()
-      };
-
-      set(ref(db, '/links'), data);
-    }
-
-    function updateLinkSection() {
-      const linkSelection = document.getElementById('linkSelection');
-      linkSelection.innerHTML = '';
-
-      selectedNurses.forEach(nurse => {
-        linkSelection.innerHTML += `
+      nurses.forEach((nurse, index) => {
+        nurseSelection.innerHTML += `
           <div>
-            <label for="${nurse}">${nurse}</label>
-            <select id="${nurse}" name="${nurse}" onchange="nurseNumberLinks['${nurse}'] = this.value;">
-              ${selectedNumbers.map(number => `<option value="${number}" ${nurseNumberLinks[nurse] === number ? 'selected' : ''}>${number}</option>`).join('')}
-            </select>
+            <input type="checkbox" id="nurse${index}" name="nurse" value="${nurse}" onchange="if (this.checked) { selectedNurses.push('${nurse}'); } else { const i = selectedNurses.indexOf('${nurse}'); if (i > -1) { selectedNurses.splice(i, 1); } delete nurseNumberLinks['${nurse}']; }">
+            <label for="nurse${index}">${nurse}</label>
           </div>
         `;
       });
-    }
 
-    window.onload = function() {
+      numbers.forEach((number, index) => {
+        numberSelection.innerHTML += `
+          <div>
+            <input type="checkbox" id="number${index}" name="number" value="${number}" onchange="if (this.checked) { selectedNumbers.push('${number}'); } else { const i = selectedNumbers.indexOf('${number}'); if (i > -1) { selectedNumbers.splice(i, 1); } for (const nurse in nurseNumberLinks) { if (nurseNumberLinks[nurse] === '${number}') { delete nurseNumberLinks[nurse]; } } }">
+            <label for="number${index}">${number}</label>
+          </div>
+        `;
+      });
+
       onValue(ref(db, '/selection'), snapshot => {
         const data = snapshot.val();
 
         if (data) {
-          selectedNurses = data.selectedNurses;
-          selectedNumbers = data.selectedNumbers;
+          selectedNursesquote("const firebaseConfig = {\n      apiKey: \"AIzaSyCYDVebdIbJ7DV_tkqvl6dXacP2gd-V6zo\",\n      authDomain: \"nurse-numbers.firebaseapp.com\",", "selectedNurses.forEach((nurse, index) => {\n            document.getElementById('nurse' + index).checked = true;\n          });")
 
-          selectedNurses.forEach((nurse, index) => {
-            document.getElementById('nurse' + index).checked = true;
-          });
+selectedNurses = data.selectedNurses;
+selectedNumbers = data.selectedNumbers;
 
-          selectedNumbers.forEach((number, index) => {
-            document.getElementById('number' + index).checked = true;
-          });
-
-          updateLinkSection();
-        }
+      selectedNurses.forEach((nurse, index) => {
+        document.getElementById('nurse' + index).checked = true;
       });
 
-      onValue(ref(db, '/links'), snapshot => {
-        const data = snapshot.val();
-
-        if (data) {
-          nurseNumberLinks = data.nurseNumberLinks;
-
-          for (let nurse in nurseNumberLinks) {
-            document.getElementById(nurse).value = nurseNumberLinks[nurse];
-          }
-        }
+      selectedNumbers.forEach((number, index) => {
+        document.getElementById('number' + index).checked = true;
       });
+
+      updateLinkSection();
     }
+  });
+
+  onValue(ref(db, '/links'), snapshot => {
+    const data = snapshot.val();
+
+    if (data) {
+      nurseNumberLinks = data.nurseNumberLinks;
+
+      for (let nurse in nurseNumberLinks) {
+        document.getElementById(nurse).value = nurseNumberLinks[nurse];
+      }
+    }
+  });
+}
+
+window.submitSelection = function() {
+  const data = {
+    selectedNurses,
+    selectedNumbers,
+    timestamp: new Date().toLocaleString()
+  };
+
+  set(ref(db, '/selection'), data);
+
+  updateLinkSection();
+}
+
+window.submitLinks = function() {
+  const data = {
+    nurseNumberLinks,
+    timestamp: new Date().toLocaleString()
+  };
+
+  set(ref(db, '/links'), data);
+}
+
+function updateLinkSection() {
+  const linkSelection = document.getElementById('linkSelection');
+  linkSelection.innerHTML = '';
+
+  selectedNurses.forEach(nurse => {
+    linkSelection.innerHTML += `
+      <div>
+        <label for="${nurse}">${nurse}</label>
+        <select id="${nurse}" name="${nurse}" onchange="nurseNumberLinks['${nurse}'] = this.value;">
+          ${selectedNumbers.map(number => `<option value="${number}" ${nurseNumberLinks[nurse] === number ? 'selected' : ''}>${number}</option>`).join('')}
+        </select>
+      </div>
+    `;
+  });
+}
   </script>
 </head>
 <body>
@@ -102,14 +127,12 @@ const firebaseConfig = {
     <div id="nurseSelection"></div>
     <button type="button" onclick="submitSelection()">Submit Selection</button>
   </form>
-
   <h2>Select Phone Numbers:</h2>
   <form id="numberForm">
     <div id="numberSelection"></div>
     <button type="button" onclick="submitSelection()">Submit Selection</button>
   </form>
-
-  <h2>Link Nurses to Numbers:</h2quote("const app = initializeApp(firebaseConfig);\n    const db", "document.getElementById(nurse).value = nurseNumberLinks[nurse];\n          }\n        }\n      });\n    }\n  </script>")
+  <h2>Link Nurses to Numbers:</h2>
   <form id="linkForm">
     <div id="linkSelection"></div>
     <button type="button" onclick="submitLinks()">Submit Links</button>
