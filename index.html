@@ -55,6 +55,13 @@
             document.getElementById('nurse' + index).checked = true;
           }
         });
+
+        // Display selected nurses on the page
+        const selectedNursesDiv = document.getElementById('selectedNurses');
+        selectedNursesDiv.innerHTML = `
+          <p>Selected Nurses: ${data.selectedNurses.join(', ')}</p>
+          <p>Timestamp: ${data.timestamp}</p>
+        `;
       }
     }
   </script>
@@ -84,3 +91,4 @@
   </script>
 </body>
 </html>
+
