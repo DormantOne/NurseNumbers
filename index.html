@@ -3,6 +3,9 @@
 <head>
   <title>Select Nurses and Phone Numbers </title>
   <script type="module">
+    const nurses = ['Nurse 1', 'Nurse 2', 'Nurse 3', 'Nurse 4', 'Nurse 5', 'Nurse 6', 'Nurse 7', 'Nurse 8', 'Nurse 9', 'Nurse 10'];
+    const numbers = ['Number 1', 'Number 2', 'Number 3', 'Number 4', 'Number 5', 'Number 6', 'Number 7', 'Number 8', 'Number 9', 'Number 10'];
+    
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
     import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
@@ -140,9 +143,6 @@ selectedDiv.innerHTML = `
   <button type="button" onclick="submitLinks()">Submit Links</button>
 
   <script>
-    const nurses = ['Nurse 1', 'Nurse 2', 'Nurse 3', 'Nurse 4', 'Nurse 5', 'Nurse 6', 'Nurse 7', 'Nurse 8', 'Nurse 9', 'Nurse 10'];
-    const numbers = ['Number 1', 'Number 2', 'Number 3', 'Number 4', 'Number 5', 'Number 6', 'Number 7', 'Number 8', 'Number 9', 'Number 10'];
-
     const nurseSelection = document.getElementById('nurseSelection');
     const numberSelection = document.getElementById('numberSelection');
 
