@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Select Nurses and Phone Numbers GOOD VERSION 2</title>
+  <title>Select Nurses and Phone Numbers </title>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
     import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
@@ -83,10 +83,13 @@ const firebaseConfig = {
     }
 
     window.onload = async function() {
-      const snapshot = await get(ref(db, '/selections'));
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        data.selectedNurses.forEach(nurse => {
+
+//- change to 
+const snapshot = await get(ref(db, '/selections'));
+const linkSnapshot = await get(ref(db, '/links')); // - add this
+if (snapshot.exists() && linkSnapshot.exists()) { // - change this
+  const data = snapshot.val();
+  nurseNumberLinks = linkSnapshot.val().nurseNumberLinks; // - add this        data.selectedNurses.forEach(nurse => {
           const index = nurses.indexOf(nurse);
           if (index > -1) {
             document.getElementById('nurse' + index).checked = true;
@@ -103,12 +106,15 @@ const firebaseConfig = {
         selectedNumbers = data.selectedNumbers;
         updateLinkSection();
 
-        const selectedDiv = document.getElementById('selected');
-        selectedDiv.innerHTML = `
-          <p>Selected Nurses: ${data.selectedNurses.join(', ')}</p>
-          <p>Selected Numbers: ${data.selectedNumbers.join(', ')}</p>
-          <p>Timestamp: ${data.timestamp}</p>
-        `;
+
+//- change to 
+const selectedDiv = document.getElementById('selected');
+selectedDiv.innerHTML = `
+  <p>Selected Nurses: ${data.selectedNurses.join(', ')}</p>
+  <p>Selected Numbers: ${data.selectedNumbers.join(', ')}</p>
+  <p>Nurse-Number Links: ${JSON.stringify(nurseNumberLinks)}</p> // - add this
+  <p>Timestamp: ${data.timestamp}</p>
+`;
       }
     }
   </script>
