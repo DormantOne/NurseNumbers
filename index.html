@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Select Nurses and Phone Numbers GOOD VERSION 2</title>
+  <title>Select Nurses and Phone Numbers</title>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
     import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
@@ -64,6 +64,12 @@ const firebaseConfig = {
       };
 
       await set(ref(db, '/links'), data);
+
+      const linkedDiv = document.getElementById('linked');
+      linkedDiv.innerHTML = `
+        <p>Linked: ${JSON.stringify(nurseNumberLinks)}</p>
+        <p>Timestamp: ${timestamp}</p>
+      `;
     }
 
     function updateLinkSection() {
@@ -82,10 +88,11 @@ const firebaseConfig = {
       });
     }
 
+    window.onload = async functionquote("window.onload = async function() {", "        </p>\n      `;\n    }\n  </script>\n</head>")
     window.onload = async function() {
-      const snapshot = await get(ref(db, '/selections'));
-      if (snapshot.exists()) {
-        const data = snapshot.val();
+      const selectionSnapshot = await get(ref(db, '/selections'));
+      if (selectionSnapshot.exists()) {
+        const data = selectionSnapshot.val();
         data.selectedNurses.forEach(nurse => {
           const index = nurses.indexOf(nurse);
           if (index > -1) {
@@ -110,6 +117,20 @@ const firebaseConfig = {
           <p>Timestamp: ${data.timestamp}</p>
         `;
       }
+
+      const linkSnapshot = await get(ref(db, '/links'));
+      if (linkSnapshot.exists()) {
+        const data = linkSnapshot.val();
+        nurseNumberLinks = data.nurseNumberLinks;
+
+        const linkedDiv = document.getElementById('linked');
+        linkedDiv.innerHTML = `
+          <p>Linked: ${JSON.stringify(data.nurseNumberLinks)}</p>
+          <p>Timestamp: ${data.timestamp}</p>
+        `;
+
+        updateLinkSection();
+      }
     }
   </script>
 </head>
@@ -128,6 +149,9 @@ const firebaseConfig = {
   <h2>Link Nurses and Numbers:</h2>
   <div id="linkSelection"></div>
   <button type="button" onclick="submitLinks()">Submit Links</button>
+
+  <h2>Linked:</h2>
+  <div id="linked"></div>
 
   <script>
     const nurses = ['Nurse 1', 'Nurse 2', 'Nurse 3', 'Nurse 4', 'Nurse 5', 'Nurse 6', 'Nurse 7', 'Nurse 8', 'Nurse 9', 'Nurse 10'];
