@@ -24,9 +24,6 @@ const firebaseConfig = {
     let selectedNumbers = [];
     let nurseNumberLinks = {};
 
-    const nurses = ['Nurse 1', 'Nurse 2', 'Nurse 3', 'Nurse 4', 'Nurse 5', 'Nurse 6', 'Nurse 7', 'Nurse 8', 'Nurse 9', 'Nurse 10'];
-    const numbers = ['Number 1', 'Number 2', 'Number 3', 'Number 4', 'Number 5', 'Number 6', 'Number 7', 'Number 8', 'Number 9', 'Number 10'];
-
     window.submitSelection = async function() {
       selectedNurses = [];
       selectedNumbers = [];
@@ -85,51 +82,35 @@ const firebaseConfig = {
       });
     }
 
+    window.onload = async function() {
+      const snapshot = await get(ref(db, '/selections'));
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        data.selectedNurses.forEach(nurse => {
+          const index = nurses.indexOf(nurse);
+          if (index > -1) {
+            document.getElementById('nurse' + index).checked = true;
+          }
+        });
+        data.selectedNumbers.forEach(number => {
+          const index = numbers.indexOf(number);
+          if (index > -1) {
+            document.getElementById('number' + index).checked = true;
+          }
+        });
 
+        selectedNurses = data.selectedNurses;
+        selectedNumbers = data.selectedNumbers;
+        updateLinkSection();
 
-
-
-window.onload = async function() {
-  const snapshot = await get(ref(db, '/selections'));
-  if (snapshot.exists()) {
-    const data = snapshot.val();
-    data.selectedNurses.forEach(nurse => {
-      const index = nurses.indexOf(nurse);
-      if (index > -1) {
-        document.getElementById('nurse' + index).checked = true;
+        const selectedDiv = document.getElementById('selected');
+        selectedDiv.innerHTML = `
+          <p>Selected Nurses: ${data.selectedNurses.join(', ')}</p>
+          <p>Selected Numbers: ${data.selectedNumbers.join(', ')}</p>
+          <p>Timestamp: ${data.timestamp}</p>
+        `;
       }
-    });
-    data.selectedNumbers.forEach(number => {
-      const index = numbers.indexOf(number);
-      if (index > -1) {
-        document.getElementById('number' + index).checked = true;
-      }
-    });
-
-    selectedNurses = data.selectedNurses;
-    selectedNumbers = data.selectedNumbers;
-    updateLinkSection();
-
-    const selectedDiv = document.getElementById('selected');
-    selectedDiv.innerHTML = `
-      <p>Selected Nurses: ${data.selectedNurses.join(', ')}</p>
-      <p>Selected Numbers: ${data.selectedNumbers.join(', ')}</p>
-      <p>Timestamp: ${data.timestamp}</p>
-    `;
-  }
-
-  const linkSnapshot = await get(ref(db, '/links'));
-  if (linkSnapshot.exists()) {
-    nurseNumberLinks = linkSnapshot.val().nurseNumberLinks;
-    
-    const linkDiv = document.getElementById('linked');
-    linkDiv.innerHTML = `
-      <p>Linked: ${JSON.stringify(nurseNumberLinks)}</p>
-      <p>Timestamp: ${linkSnapshot.val().timestamp}</p>
-    `;
-  }
-}
-
+    }
   </script>
 </head>
 <body>
@@ -147,10 +128,10 @@ window.onload = async function() {
   <h2>Link Nurses and Numbers:</h2>
   <div id="linkSelection"></div>
   <button type="button" onclick="submitLinks()">Submit Links</button>
-<h2>Linked:</h2>
-<div id="linked"></div>
 
   <script>
+    const nurses = ['Nurse 1', 'Nurse 2', 'Nurse 3', 'Nurse 4', 'Nurse 5', 'Nurse 6', 'Nurse 7', 'Nurse 8', 'Nurse 9', 'Nurse 10'];
+    const numbers = ['Number 1', 'Number 2', 'Number 3', 'Number 4', 'Number 5', 'Number 6', 'Number 7', 'Number 8', 'Number 9', 'Number 10'];
 
     const nurseSelection = document.getElementById('nurseSelection');
     const numberSelection = document.getElementById('numberSelection');
