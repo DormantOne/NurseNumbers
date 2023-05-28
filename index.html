@@ -1,109 +1,84 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Select Nurses and Numbers</title>
+  <title>Spreadsheet Data</title>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
     import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCYDVebdIbJ7DV_tkqvl6dXacP2gd-V6zo",
-  authDomain: "nurse-numbers.firebaseapp.com",
-  databaseURL: "https://nurse-numbers-default-rtdb.firebaseio.com",
-  projectId: "nurse-numbers",
-  storageBucket: "nurse-numbers.appspot.com",
-  messagingSenderId: "316071093036",
-  appId: "1:316071093036:web:233a3bf23d007bb0a2c289",
-  measurementId: "G-RW2RPJS2GC"
-};
-
+    const firebaseConfig = {
+      // Your Firebase configuration
+    };
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    const dataRef = ref(db, '/selectedData');
-    onValue(dataRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        const selectedDataDiv = document.getElementById('selectedData');
-        selectedDataDiv.innerHTML = `
-          <p>Selected Nurses: ${data.selectedNurses.join(', ')}</p>
-          <p>Selected Numbers: ${data.selectedNumbers.join(', ')}</p>
-          <p>Timestamp: ${data.timestamp}</p>
-        `;
-      }
-    });
+    window.submitData = function(room) {
+      const nurse = document.getElementById('nurse' + room).value;
+      const number = document.getElementById('number' + nurse).value;
+      const timestamp = new Date().toLocaleString();
+
+      const data = {
+        room,
+        nurse,
+        number,
+        timestamp
+      };
+
+      set(ref(db, '/data/' + room), data);
+    }
+
+    for (let i = 1; i <= 4; i++) {
+      const dataRef = ref(db, '/data/Room ' + i);
+      onValue(dataRef, (snapshot) => {
+        displayData('Room ' + i, snapshot.val());
+      });
+    }
   </script>
 </head>
 <body>
-  <h2>Select Nurses and Numbers:</h2>
-  <form id="selectionForm">
-    <div id="nurseSelection"></div>
-    <div id="numberSelection"></div>
-    <button type="button" onclick="submitSelection()">Submit</button>
-  </form>
-  <h2>Selected Nurses and Numbers:</h2>
-  <div id="selectedData"></div>
+  <div id="dataContainer"></div>
+
+  <div>
+    <h2>Enter Data</h2>
+    <div id="entryContainer"></div>
+  </div>
+
   <script>
-    const nurses = ['Nurse 1', 'Nurse 2', 'Nurse 3', 'Nurse 4', 'Nurse 5', 'Nurse 6', 'Nurse 7', 'Nurse 8', 'Nurse 9', 'Nurse 10'];
-    const nurseSelection = document.getElementById('nurseSelection');
+    const entryContainer = document.getElementById('entryContainer');
+    const nurses = ['Jane Doe', 'John Smith', 'Emily Johnson', 'Michael Brown'];
+    const numbers = ['123456789', '234567890', '345678901', '456789012'];
 
-    nurses.forEach((nurse, index) => {
-      nurseSelection.innerHTML += `
+    for (let i = 0; i < 4; i++) {
+      entryContainer.innerHTML += `
         <div>
-          <input type="checkbox" id="nurse${index}" name="nurse" value="${nurse}">
-          <label for="nurse${index}">${nurse}</label>
+          <h3>Nurse: ${nurses[i]}</h3>
+          <input type="text" id="number${nurses[i]}" value="${numbers[i]}" readonly>
         </div>
       `;
-    });
+    }
 
-    const numbers = ['123456789', '234567890', '345678901', '456789012', '567890123', '678901234'];
-    const numberSelection = document.getElementById('numberSelection');
-
-    numbers.forEach((number, index) => {
-      numberSelection.innerHTML += `
+    for (let i = 1; i <= 4; i++) {
+      entryContainer.innerHTML += `
         <div>
-          <input type="checkbox" id="number${index}" name="number" value="${number}">
-          <label for="number${index}">${number}</label>
+          <h3>Room ${i}</h3>
+          <select id="nurseRoom ${i}">
+            <option disabled selected>Select Nurse</option>
+            ${nurses.map(nurse => `<option>${nurse}</option>`).join('')}
+          </select>
+          <button onclick="submitData('Room ${i}')">Submit</button>
         </div>
       `;
-    });
+    }
+
+    function displayData(room, data) {
+      const dataContainer = document.getElementById('dataContainer');
+      dataContainer.innerHTML = `
+        <div>
+          <p>${room}: ${data.nurse} <a href="tel:${data.number}">${data.number}</a> ${data.timestamp}</p>
+        </div>
+      ` + dataContainer.innerHTML;
+    }
   </script>
-<script>
-  window.submitSelection = function() {
-    const selectedNurses = [];
-    for (let i = 0; i < 10; i++) {
-      const checkbox = document.getElementById('nurse' + i);
-      if (checkbox.checked) {
-        selectedNurses.push(checkbox.value);
-      }
-    }
-
-    const selectedNumbers = [];
-    for (let i = 0; i < 10; i++) {
-      const checkbox = document.getElementById('number' + i);
-      if (checkbox.checked) {
-        selectedNumbers.push(checkbox.value);
-      }
-    }
-
-    if (selectedNurses.length === 0 && selectedNumbers.length === 0) {
-      alert('Please select at least one nurse or one number.');
-      return;
-    }
-
-    const timestamp = new Date().toLocaleString();
-    const data = {
-      selectedNurses,
-      selectedNumbers,
-      timestamp
-    };
-
-    const dataRef = ref(db, '/selectedData');
-    set(dataRef, data);
-  }
-</script>
-
-
 </body>
 </html>
