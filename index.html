@@ -4,18 +4,17 @@
   <title>Select Nurses and Phone Numbers</title>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js"></script>
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCYDVebdIbJ7DV_tkqvl6dXacP2gd-V6zo",
-  authDomain: "nurse-numbers.firebaseapp.com",
-  databaseURL: "https://nurse-numbers-default-rtdb.firebaseio.com",
-  projectId: "nurse-numbers",
-  storageBucket: "nurse-numbers.appspot.com",
-  messagingSenderId: "316071093036",
-  appId: "1:316071093036:web:233a3bf23d007bb0a2c289",
-  measurementId: "G-RW2RPJS2GC"
-};
-
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCYDVebdIbJ7DV_tkqvl6dXacP2gd-V6zo",
+      authDomain: "nurse-numbers.firebaseapp.com",
+      databaseURL: "https://nurse-numbers-default-rtdb.firebaseio.com",
+      projectId: "nurse-numbers",
+      storageBucket: "nurse-numbers.appspot.com",
+      messagingSenderId: "316071093036",
+      appId: "1:316071093036:web:233a3bf23d007bb0a2c289",
+      measurementId: "G-RW2RPJS2GC"
+    };
 
     const app = firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
