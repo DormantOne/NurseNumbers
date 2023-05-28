@@ -2,9 +2,8 @@
 <html>
 <head>
   <title>Select Nurses and Phone Numbers</title>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js"></script>
 
 const firebaseConfig = {
   apiKey: "AIzaSyCYDVebdIbJ7DV_tkqvl6dXacP2gd-V6zo",
@@ -18,8 +17,8 @@ const firebaseConfig = {
 };
 
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
     let selectedNurses = [];
     let selectedNumbers = [];
@@ -46,7 +45,7 @@ const firebaseConfig = {
         timestamp
       };
 
-      await set(ref(db, '/selections'), data);
+      await db.ref('/selections').set(data);
       updateLinkSection();
 
       const selectedDiv = document.getElementById('selected');
@@ -64,7 +63,7 @@ const firebaseConfig = {
         timestamp
       };
 
-      await set(ref(db, '/links'), data);
+      await db.ref('/links').set(data);
 
       const linkedDiv = document.getElementById('linked');
       linkedDiv.innerHTML = `
@@ -90,7 +89,7 @@ const firebaseConfig = {
     }
 
     window.onload = async function() {
-      const selectionSnapshot = await get(ref(db, '/selections'));
+      const selectionSnapshot = await db.ref('/selections').once('value');
       if (selectionSnapshot.exists()) {
         const data = selectionSnapshot.val();
         data.selectedNurses.forEach(nurse => {
@@ -102,36 +101,34 @@ const firebaseConfig = {
         data.selectedNumbers.forEach(number => {
           const index = numbers.indexOf(number);
           if (index > -1) {
-            document.getElementById('number' + index).checked = true;
-          }
-        });
+                      document.getElementById('number' + index).checked = true;
+        }
+      });
 
-        selectedNurses = data.selectedNurses;
-        selectedNumbers = data.selectedNumbers;
-        updateLinkSection();
+      selectedNurses = data.selectedNurses;
+      selectedNumbers = data.selectedNumbers;
+      updateLinkSection();
 
-        const selectedDiv = document.getElementById('selected');
-        selectedDiv.innerHTML = `
-          <p>Selected Nurses: ${data.selectedNurses.join(', ')}</p>
-          <p>Selected Numbers: ${data.selectedNumbers.join(', ')}</p>
-          <p>Timestamp: ${data.timestamp}</p>
-        `;
-      }
-
-      const linkSnapshot = await get(ref(db, '/links'));
-      if (linkSnapshot.exists()) {
-        const data = linkSnapshot.val();
-        nurseNumberLinks = data.nurseNumberLinks;
-
-        const linkedDiv = document.getElementById('linked');
-        linkedDiv.innerHTML = `
-          <p>Linked: ${JSON.stringify(data.nurseNumberLinks)}</p>
-          <p>Timestamp: ${data.timestamp}</p>
-        `;
-
-        updateLinkSection();
-      }
+      const selectedDiv = document.getElementById('selected');
+      selectedDiv.innerHTML = `
+        <p>Selected Nurses: ${data.selectedNurses.join(', ')}</p>
+        <p>Selected Numbers: ${data.selectedNumbers.join(', ')}</p>
+        <p>Timestamp: ${data.timestamp}</p>
+      `;
     }
+
+    const linkSnapshot = await db.ref('/links').once('value');
+    if (linkSnapshot.exists()) {
+      const linkData = linkSnapshot.val();
+      nurseNumberLinks = linkData.nurseNumberLinks;
+
+      const linkedDiv = document.getElementById('linked');
+      linkedDiv.innerHTML = `
+        <p>Linked: ${JSON.stringify(linkData.nurseNumberLinks)}</p>
+        <p>Timestamp: ${linkData.timestamp}</p>
+      `;
+    }
+  }
   </script>
 </head>
 <body>
@@ -180,4 +177,6 @@ const firebaseConfig = {
   </script>
 </body>
 </html>
+
+
 
