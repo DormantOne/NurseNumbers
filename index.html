@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Select Nurses and Phone Numbers</title>
+  <title>Select Nurses</title>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCYDVebdIbJ7DV_tkqvl6dXacP2gd-V6zo",
@@ -25,142 +25,94 @@ const firebaseConfig = {
     let selectedNumbers = [];
     let nurseNumberLinks = {};
 
-    window.updateLinkSection = function() {
+    window.submitSelection = function() {
+      const data = {
+        selectedNurses,
+        selectedNumbers,
+        timestamp: new Date().toLocaleString()
+      };
+
+      set(ref(db, '/selection'), data);
+
+      updateLinkSection();
+    }
+
+    window.submitLinks = function() {
+      const data = {
+        nurseNumberLinks,
+        timestamp: new Date().toLocaleString()
+      };
+
+      set(ref(db, '/links'), data);
+    }
+
+    function updateLinkSection() {
       const linkSelection = document.getElementById('linkSelection');
       linkSelection.innerHTML = '';
+
       selectedNurses.forEach(nurse => {
-        const index = nurses.indexOf(nurse);
         linkSelection.innerHTML += `
           <div>
-            <label for="dropdown${index}">${nurse}</label>
-            <select id="dropdown${index}" onchange="updateLinks('${nurse}', this.value)">
-              <option value="">Select Number</option>
-              ${selectedNumbers.map(number => `<option value="${number}"${nurseNumberLinks[nurse] === number ? ' selected' : ''}>${number}</option>`).join('')}
+            <label for="${nurse}">${nurse}</label>
+            <select id="${nurse}" name="${nurse}" onchange="nurseNumberLinks['${nurse}'] = this.value;">
+              ${selectedNumbers.map(number => `<option value="${number}" ${nurseNumberLinks[nurse] === number ? 'selected' : ''}>${number}</option>`).join('')}
             </select>
           </div>
         `;
       });
     }
 
-    window.updateLinks = function(nurse, number) {
-      nurseNumberLinks[nurse] = number;
-    }
-
-    window.submitSelection = async function() {
-      const timestamp = new Date().toLocaleString();
-      const data = {
-        selectedNurses,
-        selectedNumbers,
-        timestamp
-      };
-
-      await set(ref(db, '/selections'), data);
-
-      updateLinkSection();
-
-      const selectedDiv = document.getElementById('selected');
-      selectedDiv.innerHTML = `
-        <p>Selected Nurses: ${selectedNurses.join(', ')}</p>
-        <p>Selected Numbers: ${selectedNumbers.join(', ')}</p>
-        <p>Timestamp: ${timestamp}</p>
-      `;
-    }
-
-    window.submitLinks = async function() {
-      const timestamp = new Date().toLocaleString();
-      const data = {
-        selectedNurses,
-        selectedNumbers,
-        nurseNumberLinks,
-        timestamp
-      };
-
-      await set(ref(db, '/selections'), data);
-
-      const selectedDiv = document.getElementById('selected');
-      selectedDiv.innerHTML = `
-        <p>Selected Nurses: ${selectedNurses.join(', ')}</p>
-        <p>Selected Numbers: ${selectedNumbers.join(', ')}</p>
-        <p>Nurse-Number Links: ${JSON.stringify(nurseNumberLinks)}</p>
-        <p>Timestamp: ${timestamp}</p>
-      `;
-    }
-
-    window.onload = async function() {
-      const snapshot = await get(ref(db, '/selections'));
-      if (snapshot.exists()) {
+    window.onload = function() {
+      onValue(ref(db, '/selection'), snapshot => {
         const data = snapshot.val();
-        selectedNurses = data.selectedNurses;
-        selectedNumbers = data.selectedNumbers;
-        nurseNumberLinks = data.nurseNumberLinks;
 
-        data.selectedNurses.forEach(nurse => {
-          const index = nurses.indexOf(nurse);
-          if (index > -1) {
+        if (data) {
+          selectedNurses = data.selectedNurses;
+          selectedNumbers = data.selectedNumbers;
+
+          selectedNurses.forEach((nurse, index) => {
             document.getElementById('nurse' + index).checked = true;
-          }
-        });
-        data.selectedNumbers.forEach(number => {
-          const index = numbers.indexOf(number);
-          if (index > -1) {
+          });
+
+          selectedNumbers.forEach((number, index) => {
             document.getElementById('number' + index).checked = true;
+          });
+
+          updateLinkSection();
+        }
+      });
+
+      onValue(ref(db, '/links'), snapshot => {
+        const data = snapshot.val();
+
+        if (data) {
+          nurseNumberLinks = data.nurseNumberLinks;
+
+          for (let nurse in nurseNumberLinks) {
+            document.getElementById(nurse).value = nurseNumberLinks[nurse];
           }
-        });
-
-updateLinkSection();
-
-        const selectedDiv = document.getElementById('selected');
-        selectedDiv.innerHTML = `
-          <p>Selected Nurses: ${selectedNurses.join(', ')}</p>
-          <p>Selected Numbers: ${selectedNumbers.join(', ')}</p>
-          <p>Nurse-Number Links: ${JSON.stringify(nurseNumberLinks)}</p>
-          <p>Timestamp: ${data.timestamp}</p>
-        `;
-      }
+        }
+      });
     }
   </script>
 </head>
 <body>
   <h2>Select Nurses:</h2>
-  <div id="nurseSelection"></div>
+  <form id="nurseForm">
+    <div id="nurseSelection"></div>
+    <button type="button" onclick="submitSelection()">Submit Selection</button>
+  </form>
 
   <h2>Select Phone Numbers:</h2>
-  <div id="numberSelection"></div>
+  <form id="numberForm">
+    <div id="numberSelection"></div>
+    <button type="button" onclick="submitSelection()">Submit Selection</button>
+  </form>
 
-  <button type="button" onclick="submitSelection()">Submit Selection</button>
-
-  <h2>Link Nurses to Numbers:</h2>
-  <div id="linkSelection"></div>
-
-  <button type="button" onclick="submitLinks()">Submit Links</button>
-
-  <h2>Selected:</h2>
-  <div id="selected"></div>
-
-  <script>
-    const nurses = ['Nurse 1', 'Nurse 2', 'Nurse 3', 'Nurse 4', 'Nurse 5', 'Nurse 6', 'Nurse 7', 'Nurse 8', 'Nurse 9', 'Nurse 10'];
-    const numbers = ['Number 1', 'Number 2', 'Number 3', 'Number 4', 'Number 5', 'Number 6', 'Number 7', 'Number 8', 'Number 9', 'Number 10'];
-
-    const nurseSelection = document.getElementById('nurseSelection');
-    const numberSelection = document.getElementById('numberSelection');
-
-    nurses.forEach((nurse, index) => {
-      nurseSelection.innerHTML += `
-        <div>
-          <input type="checkbox" id="nurse${index}" name="nurse" value="${nurse}" onchange="if (this.checked) { selectedNurses.push('${nurse}'); } else { const i = selectedNurses.indexOf('${nurse}'); if (i > -1) { selectedNurses.splice(i, 1); } delete nurseNumberLinks['${nurse}']; }">
-          <label for="nurse${index}">${nurse}</label>
-        </div>
-      `;
-    });
-
-    numbers.forEach((number, index) => {
-      numberSelection.innerHTML += `
-        <div>
-          <input type="checkbox" id="number${index}" name="number" value="${number}" onchange="if (this.checked) { selectedNumbers.push('${number}'); } else { const i = selectedNumbers.indexOf('${number}'); if (i > -1) { selectedNumbers.splice(i, 1); } Object.keys(nurseNumberLinks).forEach(nurse => { if (nurseNumberLinks[nurse] === '${number}') { delete nurseNumberLinks[nurse]; } }); }">
-          <label for="number${index}">${number}</label>
-        </div>
-      `;
-    });
-  </script>
+  <h2>Link Nurses to Numbers:</h2quote("const app = initializeApp(firebaseConfig);\n    const db", "document.getElementById(nurse).value = nurseNumberLinks[nurse];\n          }\n        }\n      });\n    }\n  </script>")
+  <form id="linkForm">
+    <div id="linkSelection"></div>
+    <button type="button" onclick="submitLinks()">Submit Links</button>
+  </form>
 </body>
 </html>
