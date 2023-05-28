@@ -51,6 +51,26 @@ const firebaseConfig = {
       const data = {
         selectedNurses,
         selectedNumbers,
+        timestamp
+      };
+
+      await set(ref(db, '/selections'), data);
+
+      updateLinkSection();
+
+      const selectedDiv = document.getElementById('selected');
+      selectedDiv.innerHTML = `
+        <p>Selected Nurses: ${selectedNurses.join(', ')}</p>
+        <p>Selected Numbers: ${selectedNumbers.join(', ')}</p>
+        <p>Timestamp: ${timestamp}</p>
+      `;
+    }
+
+    window.submitLinks = async function() {
+      const timestamp = new Date().toLocaleString();
+      const data = {
+        selectedNurses,
+        selectedNumbers,
         nurseNumberLinks,
         timestamp
       };
@@ -87,13 +107,13 @@ const firebaseConfig = {
           }
         });
 
-        updateLinkSection();
+updateLinkSection();
 
         const selectedDiv = document.getElementById('selected');
         selectedDiv.innerHTML = `
-          <p>Selected Nurses: ${data.selectedNurses.join(', ')}</p>
-          <p>Selected Numbers: ${data.selectedNumbers.join(', ')}</p>
-          <p>Nurse-Number Links: ${JSON.stringify(data.nurseNumberLinks)}</p>
+          <p>Selected Nurses: ${selectedNurses.join(', ')}</p>
+          <p>Selected Numbers: ${selectedNumbers.join(', ')}</p>
+          <p>Nurse-Number Links: ${JSON.stringify(nurseNumberLinks)}</p>
           <p>Timestamp: ${data.timestamp}</p>
         `;
       }
@@ -107,10 +127,12 @@ const firebaseConfig = {
   <h2>Select Phone Numbers:</h2>
   <div id="numberSelection"></div>
 
+  <button type="button" onclick="submitSelection()">Submit Selection</button>
+
   <h2>Link Nurses to Numbers:</h2>
   <div id="linkSelection"></div>
 
-  <button type="button" onclick="submitSelection()">Submit</button>
+  <button type="button" onclick="submitLinks()">Submit Links</button>
 
   <h2>Selected:</h2>
   <div id="selected"></div>
@@ -125,7 +147,7 @@ const firebaseConfig = {
     nurses.forEach((nurse, index) => {
       nurseSelection.innerHTML += `
         <div>
-          <input type="checkbox" id="nurse${index}" name="nurse" value="${nurse}" onchange="if (this.checked) { selectedNurses.push('${nurse}'); } else { const i = selectedNurses.indexOf('${nurse}'); if (i > -1) { selectedNurses.splice(i, 1); } delete nurseNumberLinks['${nurse}']; } updateLinkSection();">
+          <input type="checkbox" id="nurse${index}" name="nurse" value="${nurse}" onchange="if (this.checked) { selectedNurses.push('${nurse}'); } else { const i = selectedNurses.indexOf('${nurse}'); if (i > -1) { selectedNurses.splice(i, 1); } delete nurseNumberLinks['${nurse}']; }">
           <label for="nurse${index}">${nurse}</label>
         </div>
       `;
@@ -134,7 +156,7 @@ const firebaseConfig = {
     numbers.forEach((number, index) => {
       numberSelection.innerHTML += `
         <div>
-          <input type="checkbox" id="number${index}" name="number" value="${number}" onchange="if (this.checked) { selectedNumbers.push('${number}'); } else { const i = selectedNumbers.indexOf('${number}'); if (i > -1) { selectedNumbers.splice(i, 1); } Object.keys(nurseNumberLinks).forEach(nurse => { if (nurseNumberLinks[nurse] === '${number}') { delete nurseNumberLinks[nurse]; } }); } updateLinkSection();">
+          <input type="checkbox" id="number${index}" name="number" value="${number}" onchange="if (this.checked) { selectedNumbers.push('${number}'); } else { const i = selectedNumbers.indexOf('${number}'); if (i > -1) { selectedNumbers.splice(i, 1); } Object.keys(nurseNumberLinks).forEach(nurse => { if (nurseNumberLinks[nurse] === '${number}') { delete nurseNumberLinks[nurse]; } }); }">
           <label for="number${index}">${number}</label>
         </div>
       `;
