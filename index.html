@@ -1,11 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Select Nurses and Phone Numbers </title>
+  <title>Select Nurses and Phone Numbers GOOD VERSION 2</title>
   <script type="module">
-    const nurses = ['Nurse 1', 'Nurse 2', 'Nurse 3', 'Nurse 4', 'Nurse 5', 'Nurse 6', 'Nurse 7', 'Nurse 8', 'Nurse 9', 'Nurse 10'];
-    const numbers = ['Number 1', 'Number 2', 'Number 3', 'Number 4', 'Number 5', 'Number 6', 'Number 7', 'Number 8', 'Number 9', 'Number 10'];
-    
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
     import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
@@ -86,17 +83,10 @@ const firebaseConfig = {
     }
 
     window.onload = async function() {
-
-
-
-//- change to 
-const snapshot = await get(ref(db, '/selections'));
-const linkSnapshot = await get(ref(db, '/links'));
-if (snapshot.exists()) {
-  const data = snapshot.val();
-  nurseNumberLinks = linkSnapshot.exists() ? linkSnapshot.val().nurseNumberLinks : {}; 
-     
-  data.selectedNurses.forEach(nurse => {
+      const snapshot = await get(ref(db, '/selections'));
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        data.selectedNurses.forEach(nurse => {
           const index = nurses.indexOf(nurse);
           if (index > -1) {
             document.getElementById('nurse' + index).checked = true;
@@ -113,15 +103,12 @@ if (snapshot.exists()) {
         selectedNumbers = data.selectedNumbers;
         updateLinkSection();
 
-
-//- change to 
-const selectedDiv = document.getElementById('selected');
-selectedDiv.innerHTML = `
-  <p>Selected Nurses: ${data.selectedNurses.join(', ')}</p>
-  <p>Selected Numbers: ${data.selectedNumbers.join(', ')}</p>
-  <p>Nurse-Number Links: ${JSON.stringify(nurseNumberLinks)}</p> // - add this
-  <p>Timestamp: ${data.timestamp}</p>
-`;
+        const selectedDiv = document.getElementById('selected');
+        selectedDiv.innerHTML = `
+          <p>Selected Nurses: ${data.selectedNurses.join(', ')}</p>
+          <p>Selected Numbers: ${data.selectedNumbers.join(', ')}</p>
+          <p>Timestamp: ${data.timestamp}</p>
+        `;
       }
     }
   </script>
@@ -143,6 +130,9 @@ selectedDiv.innerHTML = `
   <button type="button" onclick="submitLinks()">Submit Links</button>
 
   <script>
+    const nurses = ['Nurse 1', 'Nurse 2', 'Nurse 3', 'Nurse 4', 'Nurse 5', 'Nurse 6', 'Nurse 7', 'Nurse 8', 'Nurse 9', 'Nurse 10'];
+    const numbers = ['Number 1', 'Number 2', 'Number 3', 'Number 4', 'Number 5', 'Number 6', 'Number 7', 'Number 8', 'Number 9', 'Number 10'];
+
     const nurseSelection = document.getElementById('nurseSelection');
     const numberSelection = document.getElementById('numberSelection');
 
