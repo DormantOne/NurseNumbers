@@ -84,12 +84,15 @@ const firebaseConfig = {
 
     window.onload = async function() {
 
+
+
 //- change to 
 const snapshot = await get(ref(db, '/selections'));
-const linkSnapshot = await get(ref(db, '/links')); // - add this
-if (snapshot.exists() && linkSnapshot.exists()) { // - change this
+const linkSnapshot = await get(ref(db, '/links'));
+if (snapshot.exists()) {
   const data = snapshot.val();
-  nurseNumberLinks = linkSnapshot.val().nurseNumberLinks; // - add this        
+  nurseNumberLinks = linkSnapshot.exists() ? linkSnapshot.val().nurseNumberLinks : {}; 
+     
   data.selectedNurses.forEach(nurse => {
           const index = nurses.indexOf(nurse);
           if (index > -1) {
