@@ -89,7 +89,8 @@ const snapshot = await get(ref(db, '/selections'));
 const linkSnapshot = await get(ref(db, '/links')); // - add this
 if (snapshot.exists() && linkSnapshot.exists()) { // - change this
   const data = snapshot.val();
-  nurseNumberLinks = linkSnapshot.val().nurseNumberLinks; // - add this        data.selectedNurses.forEach(nurse => {
+  nurseNumberLinks = linkSnapshot.val().nurseNumberLinks; // - add this        
+  data.selectedNurses.forEach(nurse => {
           const index = nurses.indexOf(nurse);
           if (index > -1) {
             document.getElementById('nurse' + index).checked = true;
