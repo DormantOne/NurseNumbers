@@ -1,23 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Select Nurses and Phone Numbers</title>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js"></script>
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyCYDVebdIbJ7DV_tkqvl6dXacP2gd-V6zo",
-      authDomain: "nurse-numbers.firebaseapp.com",
-      databaseURL: "https://nurse-numbers-default-rtdb.firebaseio.com",
-      projectId: "nurse-numbers",
-      storageBucket: "nurse-numbers.appspot.com",
-      messagingSenderId: "316071093036",
-      appId: "1:316071093036:web:233a3bf23d007bb0a2c289",
-      measurementId: "G-RW2RPJS2GC"
-    };
+  <title>Select Nurses and Phone Numbers GOOD VERSION 2</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+const firebaseConfig = {
+  apiKey: "AIzaSyCYDVebdIbJ7DV_tkqvl6dXacP2gd-V6zo",
+  authDomain: "nurse-numbers.firebaseapp.com",
+  databaseURL: "https://nurse-numbers-default-rtdb.firebaseio.com",
+  projectId: "nurse-numbers",
+  storageBucket: "nurse-numbers.appspot.com",
+  messagingSenderId: "316071093036",
+  appId: "1:316071093036:web:233a3bf23d007bb0a2c289",
+  measurementId: "G-RW2RPJS2GC"
+};
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
     let selectedNurses = [];
     let selectedNumbers = [];
@@ -44,7 +45,7 @@
         timestamp
       };
 
-      await db.ref('/selections').set(data);
+      await set(ref(db, '/selections'), data);
       updateLinkSection();
 
       const selectedDiv = document.getElementById('selected');
@@ -62,13 +63,7 @@
         timestamp
       };
 
-      await db.ref('/links').set(data);
-
-      const linkedDiv = document.getElementById('linked');
-      linkedDiv.innerHTML = `
-        <p>Linked: ${JSON.stringify(nurseNumberLinks)}</p>
-        <p>Timestamp: ${timestamp}</p>
-      `;
+      await set(ref(db, '/links'), data);
     }
 
     function updateLinkSection() {
@@ -88,9 +83,9 @@
     }
 
     window.onload = async function() {
-      const selectionSnapshot = await db.ref('/selections').once('value');
-      if (selectionSnapshot.exists()) {
-        const data = selectionSnapshot.val();
+      const snapshot = await get(ref(db, '/selections'));
+      if (snapshot.exists()) {
+        const data = snapshot.val();
         data.selectedNurses.forEach(nurse => {
           const index = nurses.indexOf(nurse);
           if (index > -1) {
@@ -100,34 +95,22 @@
         data.selectedNumbers.forEach(number => {
           const index = numbers.indexOf(number);
           if (index > -1) {
-                      document.getElementById('number' + index).checked = true;
-        }
-      });
+            document.getElementById('number' + index).checked = true;
+          }
+        });
 
-      selectedNurses = data.selectedNurses;
-      selectedNumbers = data.selectedNumbers;
-      updateLinkSection();
+        selectedNurses = data.selectedNurses;
+        selectedNumbers = data.selectedNumbers;
+        updateLinkSection();
 
-      const selectedDiv = document.getElementById('selected');
-      selectedDiv.innerHTML = `
-        <p>Selected Nurses: ${data.selectedNurses.join(', ')}</p>
-        <p>Selected Numbers: ${data.selectedNumbers.join(', ')}</p>
-        <p>Timestamp: ${data.timestamp}</p>
-      `;
+        const selectedDiv = document.getElementById('selected');
+        selectedDiv.innerHTML = `
+          <p>Selected Nurses: ${data.selectedNurses.join(', ')}</p>
+          <p>Selected Numbers: ${data.selectedNumbers.join(', ')}</p>
+          <p>Timestamp: ${data.timestamp}</p>
+        `;
+      }
     }
-
-    const linkSnapshot = await db.ref('/links').once('value');
-    if (linkSnapshot.exists()) {
-      const linkData = linkSnapshot.val();
-      nurseNumberLinks = linkData.nurseNumberLinks;
-
-      const linkedDiv = document.getElementById('linked');
-      linkedDiv.innerHTML = `
-        <p>Linked: ${JSON.stringify(linkData.nurseNumberLinks)}</p>
-        <p>Timestamp: ${linkData.timestamp}</p>
-      `;
-    }
-  }
   </script>
 </head>
 <body>
@@ -145,9 +128,6 @@
   <h2>Link Nurses and Numbers:</h2>
   <div id="linkSelection"></div>
   <button type="button" onclick="submitLinks()">Submit Links</button>
-
-  <h2>Linked:</h2>
-  <div id="linked"></div>
 
   <script>
     const nurses = ['Nurse 1', 'Nurse 2', 'Nurse 3', 'Nurse 4', 'Nurse 5', 'Nurse 6', 'Nurse 7', 'Nurse 8', 'Nurse 9', 'Nurse 10'];
@@ -176,6 +156,3 @@
   </script>
 </body>
 </html>
-
-
-
