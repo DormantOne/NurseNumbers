@@ -69,7 +69,7 @@ const firebaseConfig = {
       `;
     });
   </script>
-  <script>
+<script>
   window.submitSelection = function() {
     const selectedNurses = [];
     for (let i = 0; i < 10; i++) {
@@ -99,9 +99,11 @@ const firebaseConfig = {
       timestamp
     };
 
-    set(ref(db, '/selectedData'), data);
+    const dataRef = ref(db, '/selectedData');
+    set(dataRef, data);
   }
 </script>
+
 
 </body>
 </html>
