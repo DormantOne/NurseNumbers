@@ -17,26 +17,36 @@ const firebaseConfig = {
   measurementId: "G-RW2RPJS2GC"
 };
 
+
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    window.submitSelection = async function() {
-      const selectedNurses = [];
-      const selectedNumbers = [];
-      const nurseNumberLinks = {};
-      for (let i = 0; i < 10; i++) {
-        const nurseCheckbox = document.getElementById('nurse' + i);
-        const numberCheckbox = document.getElementById('number' + i);
-        if (nurseCheckbox.checked) {
-          selectedNurses.push(nurseCheckbox.value);
-          const dropdown = document.getElementById('dropdown' + i);
-          nurseNumberLinks[nurseCheckbox.value] = dropdown.value;
-        }
-        if (numberCheckbox.checked) {
-          selectedNumbers.push(numberCheckbox.value);
-        }
-      }
+    let selectedNurses = [];
+    let selectedNumbers = [];
+    let nurseNumberLinks = {};
 
+    window.updateLinkSection = function() {
+      const linkSelection = document.getElementById('linkSelection');
+      linkSelection.innerHTML = '';
+      selectedNurses.forEach(nurse => {
+        const index = nurses.indexOf(nurse);
+        linkSelection.innerHTML += `
+          <div>
+            <label for="dropdown${index}">${nurse}</label>
+            <select id="dropdown${index}" onchange="updateLinks('${nurse}', this.value)">
+              <option value="">Select Number</option>
+              ${selectedNumbers.map(number => `<option value="${number}"${nurseNumberLinks[nurse] === number ? ' selected' : ''}>${number}</option>`).join('')}
+            </select>
+          </div>
+        `;
+      });
+    }
+
+    window.updateLinks = function(nurse, number) {
+      nurseNumberLinks[nurse] = number;
+    }
+
+    window.submitSelection = async function() {
       const timestamp = new Date().toLocaleString();
       const data = {
         selectedNurses,
@@ -60,12 +70,14 @@ const firebaseConfig = {
       const snapshot = await get(ref(db, '/selections'));
       if (snapshot.exists()) {
         const data = snapshot.val();
+        selectedNurses = data.selectedNurses;
+        selectedNumbers = data.selectedNumbers;
+        nurseNumberLinks = data.nurseNumberLinks;
+
         data.selectedNurses.forEach(nurse => {
           const index = nurses.indexOf(nurse);
           if (index > -1) {
             document.getElementById('nurse' + index).checked = true;
-            const dropdown = document.getElementById('dropdown' + index);
-            dropdown.value = data.nurseNumberLinks[nurse];
           }
         });
         data.selectedNumbers.forEach(number => {
@@ -74,6 +86,8 @@ const firebaseConfig = {
             document.getElementById('number' + index).checked = true;
           }
         });
+
+        updateLinkSection();
 
         const selectedDiv = document.getElementById('selected');
         selectedDiv.innerHTML = `
@@ -102,17 +116,16 @@ const firebaseConfig = {
   <div id="selected"></div>
 
   <script>
-const nurses = ['Nurse 1', 'Nurse 2', 'Nurse 3', 'Nurse 4', 'Nurse 5', 'Nurse 6', 'Nurse 7', 'Nurse 8', 'Nurse 9', 'Nurse 10'];
+    const nurses = ['Nurse 1', 'Nurse 2', 'Nurse 3', 'Nurse 4', 'Nurse 5', 'Nurse 6', 'Nurse 7', 'Nurse 8', 'Nurse 9', 'Nurse 10'];
     const numbers = ['Number 1', 'Number 2', 'Number 3', 'Number 4', 'Number 5', 'Number 6', 'Number 7', 'Number 8', 'Number 9', 'Number 10'];
 
     const nurseSelection = document.getElementById('nurseSelection');
     const numberSelection = document.getElementById('numberSelection');
-    const linkSelection = document.getElementById('linkSelection');
 
     nurses.forEach((nurse, index) => {
       nurseSelection.innerHTML += `
         <div>
-          <input type="checkbox" id="nurse${index}" name="nurse" value="${nurse}">
+          <input type="checkbox" id="nurse${index}" name="nurse" value="${nurse}" onchange="if (this.checked) { selectedNurses.push('${nurse}'); } else { const i = selectedNurses.indexOf('${nurse}'); if (i > -1) { selectedNurses.splice(i, 1); } delete nurseNumberLinks['${nurse}']; } updateLinkSection();">
           <label for="nurse${index}">${nurse}</label>
         </div>
       `;
@@ -121,20 +134,8 @@ const nurses = ['Nurse 1', 'Nurse 2', 'Nurse 3', 'Nurse 4', 'Nurse 5', 'Nurse 6'
     numbers.forEach((number, index) => {
       numberSelection.innerHTML += `
         <div>
-          <input type="checkbox" id="number${index}" name="number" value="${number}">
+          <input type="checkbox" id="number${index}" name="number" value="${number}" onchange="if (this.checked) { selectedNumbers.push('${number}'); } else { const i = selectedNumbers.indexOf('${number}'); if (i > -1) { selectedNumbers.splice(i, 1); } Object.keys(nurseNumberLinks).forEach(nurse => { if (nurseNumberLinks[nurse] === '${number}') { delete nurseNumberLinks[nurse]; } }); } updateLinkSection();">
           <label for="number${index}">${number}</label>
-        </div>
-      `;
-    });
-
-    nurses.forEach((nurse, index) => {
-      linkSelection.innerHTML += `
-        <div>
-          <label for="dropdown${index}">${nurse}</label>
-          <select id="dropdown${index}">
-            <option value="">Select Number</option>
-            ${numbers.map(number => `<option value="${number}">${number}</option>`).join('')}
-          </select>
         </div>
       `;
     });
