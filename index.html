@@ -69,5 +69,39 @@ const firebaseConfig = {
       `;
     });
   </script>
+  <script>
+  window.submitSelection = function() {
+    const selectedNurses = [];
+    for (let i = 0; i < 10; i++) {
+      const checkbox = document.getElementById('nurse' + i);
+      if (checkbox.checked) {
+        selectedNurses.push(checkbox.value);
+      }
+    }
+
+    const selectedNumbers = [];
+    for (let i = 0; i < 10; i++) {
+      const checkbox = document.getElementById('number' + i);
+      if (checkbox.checked) {
+        selectedNumbers.push(checkbox.value);
+      }
+    }
+
+    if (selectedNurses.length === 0 && selectedNumbers.length === 0) {
+      alert('Please select at least one nurse or one number.');
+      return;
+    }
+
+    const timestamp = new Date().toLocaleString();
+    const data = {
+      selectedNurses,
+      selectedNumbers,
+      timestamp
+    };
+
+    set(ref(db, '/selectedData'), data);
+  }
+</script>
+
 </body>
 </html>
