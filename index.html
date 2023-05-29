@@ -114,8 +114,12 @@ window.onload = async function() {
   const linksSnapshot = await get(ref(db, '/links'));
   if (linksSnapshot.exists()) {
     const linksData = linksSnapshot.val();
-    nurseNumberLinks = linksData.nurseNumberLinks;
-    updateLinkSection();
+    if (linksData && typeof linksData.nurseNumberLinks === 'object') {
+      nurseNumberLinks = linksData.nurseNumberLinks;
+      updateLinkSection();
+    } else {
+      console.error('Unexpected structure for nurseNumberLinks data:', linksData);
+    }
   }
 }
 
