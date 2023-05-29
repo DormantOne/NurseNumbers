@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Select Nurses and Phone Numbers </title>
+  <title>Select Nurses and Phone Numbers GOOD VERSION 2</title>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
     import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
@@ -82,48 +82,16 @@ const firebaseConfig = {
       });
     }
 
-window.onload = async function() {
-  const selectionsSnapshot = await get(ref(db, '/selections'));
-  const linksSnapshot = await get(ref(db, '/links'));
-  
-  // Retrieving selected nurses and numbers
-  if (selectionsSnapshot.exists()) {
-    const selectionsData = selectionsSnapshot.val();
-    
-    selectionsData.selectedNurses.forEach(nurse => {
-      const index = nurses.indexOf(nurse);
-      if (index > -1) {
-        document.getElementById('nurse' + index).checked = true;
-      }
-    });
-
-    selectionsData.selectedNumbers.forEach(number => {
-      const index = numbers.indexOf(number);
-      if (index > -1) {
-        document.getElementById('number' + index).checked = true;
-      }
-    });
-
-    selectedNurses = selectionsData.selectedNurses;
-    selectedNumbers = selectionsData.selectedNumbers;
-    updateLinkSection();
-
-    const selectedDiv = document.getElementById('selected');
-    selectedDiv.innerHTML = `
-      <p>Selected Nurses: ${selectionsData.selectedNurses.join(', ')}</p>
-      <p>Selected Numbers: ${selectionsData.selectedNumbers.join(', ')}</p>
-      <p>Timestamp: ${selectionsData.timestamp}</p>
-    `;
-  }
-  
-  // Retrieving nurse-number links
-  if (linksSnapshot.exists()) {
-    const linksData = linksSnapshot.val();
-    nurseNumberLinks = linksData.nurseNumberLinks;
-    updateLinkSection();
-  }
-}
-
+    window.onload = async function() {
+      const snapshot = await get(ref(db, '/selections'));
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        data.selectedNurses.forEach(nurse => {
+          const index = nurses.indexOf(nurse);
+          if (index > -1) {
+            document.getElementById('nurse' + index).checked = true;
+          }
+        });
         data.selectedNumbers.forEach(number => {
           const index = numbers.indexOf(number);
           if (index > -1) {
