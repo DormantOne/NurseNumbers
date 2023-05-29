@@ -4,7 +4,8 @@
   <title>Select Nurses and Phone Numbers GOOD VERSION 2</title>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+    import { getDatabase, ref, set, get, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyCYDVebdIbJ7DV_tkqvl6dXacP2gd-V6zo",
@@ -56,15 +57,23 @@ const firebaseConfig = {
       `;
     }
 
+    
+    
     window.submitLinks = async function() {
-      const timestamp = new Date().toLocaleString();
-      const data = {
-        nurseNumberLinks,
-        timestamp
-      };
+  const timestamp = new Date().toLocaleString();
+  const data = {
+    timestamp
+  };
 
-      await set(ref(db, '/links'), data);
-    }
+  // Merge nurseNumberLinks into data.
+  Object.assign(data, nurseNumberLinks);
+
+  await update(ref(db, '/links'), data);
+}
+
+    
+    
+
 
 function updateLinkSection() {
   const linkSelection = document.getElementById('linkSelection');
