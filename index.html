@@ -79,6 +79,7 @@ window.submitLinks = async function() {
 
 
 
+
 function updateLinkSection() {
   const linkSelection = document.getElementById('linkSelection');
   linkSelection.innerHTML = '';
@@ -87,7 +88,7 @@ function updateLinkSection() {
     linkSelection.innerHTML += `
       <div>
         <label for="${nurse}">${nurse}</label>
-        <select id="${nurse}" name="${nurse}" onchange="updateNurseNumberLink('${nurse}', this.value)">
+        <select id="nurseNumber${nurse}" name="${nurse}" onchange="updateNurseNumberLink('${nurse}', this.value)">
           ${selectedNumbers.map(number => `<option value="${number}" ${nurseNumberLinks[nurse] && nurseNumberLinks[nurse] === number ? 'selected' : ''}>${number}</option>`).join('')}
         </select>
       </div>
@@ -96,11 +97,10 @@ function updateLinkSection() {
 }
 
 
+
 window.updateNurseNumberLink = function(nurse, number) {
   nurseNumberLinks[nurse] = number;
 }
-
-    
 
 
 window.onload = async function() {
