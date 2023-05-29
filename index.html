@@ -59,17 +59,23 @@ const firebaseConfig = {
 
     
     
-    window.submitLinks = async function() {
+window.submitLinks = async function() {
   const timestamp = new Date().toLocaleString();
-  const data = {
-    timestamp
-  };
+  let nurseNumberLinks = {};
 
-  // Merge nurseNumberLinks into data.
-  Object.assign(data, nurseNumberLinks);
+  selectedNurses.forEach(nurse => {
+    const number = document.getElementById(`nurseNumber${nurse}`).value;
+    nurseNumberLinks[`Nurse ${nurse}`] = number;
+  });
+
+  const data = {
+    timestamp,
+    nurseNumberLinks
+  };
 
   await update(ref(db, '/links'), data);
 }
+
 
     
     
