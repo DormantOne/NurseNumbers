@@ -82,35 +82,43 @@ const firebaseConfig = {
       });
     }
 
-    window.onload = async function() {
-      const snapshot = await get(ref(db, '/selections'));
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        data.selectedNurses.forEach(nurse => {
-          const index = nurses.indexOf(nurse);
-          if (index > -1) {
-            document.getElementById('nurse' + index).checked = true;
-          }
-        });
-        data.selectedNumbers.forEach(number => {
-          const index = numbers.indexOf(number);
-          if (index > -1) {
-            document.getElementById('number' + index).checked = true;
-          }
-        });
-
-        selectedNurses = data.selectedNurses;
-        selectedNumbers = data.selectedNumbers;
-        updateLinkSection();
-
-        const selectedDiv = document.getElementById('selected');
-        selectedDiv.innerHTML = `
-          <p>Selected Nurses: ${data.selectedNurses.join(', ')}</p>
-          <p>Selected Numbers: ${data.selectedNumbers.join(', ')}</p>
-          <p>Timestamp: ${data.timestamp}</p>
-        `;
+window.onload = async function() {
+  const selectionsSnapshot = await get(ref(db, '/selections'));
+  if (selectionsSnapshot.exists()) {
+    const data = selectionsSnapshot.val();
+    data.selectedNurses.forEach(nurse => {
+      const index = nurses.indexOf(nurse);
+      if (index > -1) {
+        document.getElementById('nurse' + index).checked = true;
       }
-    }
+    });
+    data.selectedNumbers.forEach(number => {
+      const index = numbers.indexOf(number);
+      if (index > -1) {
+        document.getElementById('number' + index).checked = true;
+      }
+    });
+
+    selectedNurses = data.selectedNurses;
+    selectedNumbers = data.selectedNumbers;
+    updateLinkSection();
+
+    const selectedDiv = document.getElementById('selected');
+    selectedDiv.innerHTML = `
+      <p>Selected Nurses: ${data.selectedNurses.join(', ')}</p>
+      <p>Selected Numbers: ${data.selectedNumbers.join(', ')}</p>
+      <p>Timestamp: ${data.timestamp}</p>
+    `;
+  }
+
+  const linksSnapshot = await get(ref(db, '/links'));
+  if (linksSnapshot.exists()) {
+    const linksData = linksSnapshot.val();
+    nurseNumberLinks = linksData.nurseNumberLinks;
+    updateLinkSection();
+  }
+}
+
   </script>
 </head>
 <body>
