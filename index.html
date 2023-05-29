@@ -66,21 +66,22 @@ const firebaseConfig = {
       await set(ref(db, '/links'), data);
     }
 
-    function updateLinkSection() {
-      const linkSelection = document.getElementById('linkSelection');
-      linkSelection.innerHTML = '';
+function updateLinkSection() {
+  const linkSelection = document.getElementById('linkSelection');
+  linkSelection.innerHTML = '';
 
-      selectedNurses.forEach(nurse => {
-        linkSelection.innerHTML += `
-          <div>
-            <label for="${nurse}">${nurse}</label>
-            <select id="${nurse}" name="${nurse}" onchange="nurseNumberLinks['${nurse}'] = this.value;">
-              ${selectedNumbers.map(number => `<option value="${number}" ${nurseNumberLinks[nurse] === number ? 'selected' : ''}>${number}</option>`).join('')}
-            </select>
-          </div>
-        `;
-      });
-    }
+  selectedNurses.forEach(nurse => {
+    linkSelection.innerHTML += `
+      <div>
+        <label for="${nurse}">${nurse}</label>
+        <select id="${nurse}" name="${nurse}" onchange="nurseNumberLinks['${nurse}'] = this.value;">
+          ${selectedNumbers.map(number => `<option value="${number}" ${nurseNumberLinks[nurse] && nurseNumberLinks[nurse] === number ? 'selected' : ''}>${number}</option>`).join('')}
+        </select>
+      </div>
+    `;
+  });
+}
+
 
 window.onload = async function() {
   const snapshot = await get(ref(db, '/selections'));
