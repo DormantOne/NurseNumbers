@@ -83,45 +83,45 @@ const firebaseConfig = {
     }
 
 window.onload = async function() {
-  const selectionsSnapshot = await get(ref(db, '/selections'));
-  if (selectionsSnapshot.exists()) {
-    const data = selectionsSnapshot.val();
-    data.selectedNurses.forEach(nurse => {
+  const snapshot = await get(ref(db, '/selections'));
+  if (snapshot.exists()) {
+    const data = snapshot.val();
+
+    selectedNurses = data.selectedNurses ? data.selectedNurses : [];
+    selectedNumbers = data.selectedNumbers ? data.selectedNumbers : [];
+
+    selectedNurses.forEach(nurse => {
       const index = nurses.indexOf(nurse);
       if (index > -1) {
         document.getElementById('nurse' + index).checked = true;
       }
     });
-    data.selectedNumbers.forEach(number => {
+
+    selectedNumbers.forEach(number => {
       const index = numbers.indexOf(number);
       if (index > -1) {
         document.getElementById('number' + index).checked = true;
       }
     });
 
-    selectedNurses = data.selectedNurses;
-    selectedNumbers = data.selectedNumbers;
+    // Load links from the database
+    const linksSnapshot = await get(ref(db, '/links'));
+    if (linksSnapshot.exists()) {
+      const linksData = linksSnapshot.val();
+      nurseNumberLinks = linksData.nurseNumberLinks ? linksData.nurseNumberLinks : {};
+    }
+
     updateLinkSection();
 
     const selectedDiv = document.getElementById('selected');
     selectedDiv.innerHTML = `
-      <p>Selected Nurses: ${data.selectedNurses.join(', ')}</p>
-      <p>Selected Numbers: ${data.selectedNumbers.join(', ')}</p>
+      <p>Selected Nurses: ${selectedNurses.join(', ')}</p>
+      <p>Selected Numbers: ${selectedNumbers.join(', ')}</p>
       <p>Timestamp: ${data.timestamp}</p>
     `;
   }
-
-  const linksSnapshot = await get(ref(db, '/links'));
-  if (linksSnapshot.exists()) {
-    const linksData = linksSnapshot.val();
-    if (linksData && typeof linksData.nurseNumberLinks === 'object') {
-      nurseNumberLinks = linksData.nurseNumberLinks;
-      updateLinkSection();
-    } else {
-      console.error('Unexpected structure for nurseNumberLinks data:', linksData);
-    }
-  }
 }
+
 
   </script>
 </head>
