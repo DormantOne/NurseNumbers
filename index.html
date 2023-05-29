@@ -61,7 +61,7 @@ const firebaseConfig = {
     
 window.submitLinks = async function() {
   const timestamp = new Date().toLocaleString();
-  let nurseNumberLinks = {};
+  // let nurseNumberLinks = {}; // remove this line
 
   selectedNurses.forEach(nurse => {
     const number = document.getElementById(`nurseNumber${nurse}`).value;
@@ -77,8 +77,6 @@ window.submitLinks = async function() {
 }
 
 
-    
-    
 
 
 function updateLinkSection() {
@@ -89,13 +87,20 @@ function updateLinkSection() {
     linkSelection.innerHTML += `
       <div>
         <label for="${nurse}">${nurse}</label>
-        <select id="${nurse}" name="${nurse}" onchange="nurseNumberLinks['${nurse}'] = this.value;">
+        <select id="${nurse}" name="${nurse}" onchange="updateNurseNumberLink('${nurse}', this.value)">
           ${selectedNumbers.map(number => `<option value="${number}" ${nurseNumberLinks[nurse] && nurseNumberLinks[nurse] === number ? 'selected' : ''}>${number}</option>`).join('')}
         </select>
       </div>
     `;
   });
 }
+
+
+window.updateNurseNumberLink = function(nurse, number) {
+  nurseNumberLinks[nurse] = number;
+}
+
+    
 
 
 window.onload = async function() {
